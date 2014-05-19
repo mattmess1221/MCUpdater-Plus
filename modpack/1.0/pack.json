@@ -12,6 +12,12 @@
 			"version": "5.0.5",
 			"file": "mods/buildcraft-5.0.5.jar",
 			"md5": "f6c5eb3eec0cf5ba3871828d718a75ed"
+		},
+		{
+			"modid": "Thaumcraft",
+			"version": "1.7.2-4.1.1.12",
+			"file": "https://dl.dropboxusercontent.com/u/47135879/Thaumcraft-1.7.2-4.1.1.12.jar",
+			"md5": "a23999f97590c909833263f452ab6104"
 		}
 	]
 }

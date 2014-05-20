@@ -1,29 +1,50 @@
 package mcupdater;
 
-import java.io.File;
-import java.util.List;
-
+import com.google.common.collect.Lists;
+import com.google.common.collect.Maps;
 import net.minecraft.launchwrapper.ITweaker;
+import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import com.google.common.collect.Lists;
+import java.io.File;
+import java.util.List;
+import java.util.Map;
 
 public class Updater implements ITweaker {
-	private List<String> args = Lists.newArrayList();
+	private Map<String,String> launchArgs = Maps.newHashMap();
+    private List<String> standaloneArgs;
+    private File gameDirectory;
 
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir,
 			String profile) {
-		//this.gameDir = gameDir;
-		this.args.addAll(args);
-		this.args.add("--gameDir");
-		this.args.add(gameDir.toString());
-		this.args.add("--assetsDir");
-		this.args.add(assetsDir.toString());
-		this.args.add("--profile");
-		this.args.add(profile);
 
-		new UpdaterMain(gameDir).main(args.toArray(new String[0]));
+        gameDirectory = gameDir == null ? new File(".") : gameDir;
+
+        if(!Launch.blackboard.containsKey("launchArgs")){
+            launchArgs = Maps.newHashMap();
+            Launch.blackboard.put("launchArgs",launchArgs);
+        }else{
+            if(Launch.blackboard.get("launchArgs") instanceof Map){
+                launchArgs = (Map) Launch.blackboard.get("launchArgs");
+            }else{
+                throw(new RuntimeException());
+            }
+        }
+
+        standaloneArgs = args;
+
+        if(!this.launchArgs.containsKey("--version"))
+            this.launchArgs.put("--version","version");
+
+        if(!this.launchArgs.containsKey("--gameDir"))
+            this.launchArgs.put("--gameDir",gameDirectory.getAbsolutePath());
+
+        if(!this.launchArgs.containsKey("--assetsDir"))
+            this.launchArgs.put("--assetsDir",assetsDir.getAbsolutePath());
+
+
+        new UpdaterMain(gameDir).main(args.toArray(new String[args.size()]));
 	}
 
 	@Override
@@ -37,7 +58,14 @@ public class Updater implements ITweaker {
 
 	@Override
 	public String[] getLaunchArguments() {
-		return new String[] {};
+        List<String> args = Lists.newArrayList();
+        args.addAll(this.standaloneArgs);
+         for(Map.Entry<String,String> arg : launchArgs.entrySet()){
+            args.add(arg.getKey());
+            args.add(arg.getValue());
+         }
+        this.launchArgs.clear();
+        return args.toArray(new String[args.size()]);
 	}
 
 }

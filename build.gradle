@@ -1,6 +1,11 @@
 apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
+apply plugin: 'maven'
+apply plugin: 'application'
+apply plugin: 'launch4j'
+
+mainClassName = 'mcupdater.ServerMain'
 
 group = 'mcupdater'
 
@@ -13,10 +18,27 @@ repositories {
 
 }
 
+buildscript {
+	repositories {
+		mavenCentral()
+	}
+	dependencies {
+		classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
+	}
+}
+
+jar {
+	manifest{
+		attributes 'Main-Class': mainClassName
+	}
+}
+
 dependencies {
 	compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
 	compile group: 'log4j', name:'log4j', version:'1.2.7'
 	compile group: 'net.minecraft', name: 'launchwrapper', version:'1.9'
 	compile group: 'commons-io', name: 'commons-io', version: '2.4' 
 	compile group: 'com.google.guava', name: 'guava', version: '17.0'
+
 }
+

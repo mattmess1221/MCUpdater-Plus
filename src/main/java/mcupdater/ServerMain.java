@@ -1,5 +1,8 @@
 package mcupdater;
 
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
+
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;
@@ -9,6 +12,10 @@ import java.net.URLClassLoader;
 
 
 public class ServerMain {
+
+    //TODO add an argument for this
+    private static String mcjarprefix = "minecraft_server";
+
 
 	public static void main(final String[] args) throws Exception {
 		if(new ServerMain().loadMCJar()){
@@ -23,7 +30,7 @@ public class ServerMain {
 		boolean mcfound = false;
 		System.out.println("Loading Libraries...");
 		for(File file : new File(System.getProperty("user.dir")).listFiles()){
-			if(file.getName().startsWith("minecraft_server") && file.getName().endsWith(".jar")){
+			if(file.getName().startsWith(mcjarprefix) && file.getName().endsWith(".jar")){
 				addURL(file.toURI().toURL());
 				mcfound = true;
 			} else if (file.isDirectory() && file.getName().equals("libraries")){

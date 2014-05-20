@@ -2,6 +2,9 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
+apply plugin: 'application'
+
+mainClassName = 'mcupdater.ServerMain'
 
 group = 'mcupdater'
 
@@ -14,6 +17,12 @@ repositories {
 
 }
 
+jar {
+	manifest{
+		attributes 'Main-Class': mainClassName
+	}
+}
+
 dependencies {
 	compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
 	compile group: 'log4j', name:'log4j', version:'1.2.7'
@@ -21,3 +30,4 @@ dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.4' 
 	compile group: 'com.google.guava', name: 'guava', version: '17.0'
 }
+

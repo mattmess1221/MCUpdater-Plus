@@ -1,0 +1,22 @@
+apply plugin: 'java'
+apply plugin: 'idea'
+apply plugin: 'eclipse'
+
+group = 'mcupdater'
+
+repositories {
+	mavenCentral()
+	maven {
+		name = 'minecraft'
+		url = 'https://libraries.minecraft.net/'
+	}
+
+}
+
+dependencies {
+	compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
+	compile group: 'log4j', name:'log4j', version:'1.2.7'
+	compile group: 'net.minecraft', name: 'launchwrapper', version:'1.9'
+	compile group: 'commons-io', name: 'commons-io', version: '2.4' 
+	compile group: 'com.google.guava', name: 'guava', version: '17.0'
+}

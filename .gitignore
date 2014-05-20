@@ -1,1 +1,9 @@
 /bin
+/.gradle/
+*.iml
+*.ipr
+*.iws
+.project
+.classpath
+/out/
+/build/

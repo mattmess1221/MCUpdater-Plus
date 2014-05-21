@@ -9,14 +9,14 @@ import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 
-public class ModContainer {
+public class LocalMod implements Mod{
 
 	private String name;
 	private String modid;
 	private String version;
 	private File file;
 
-	public ModContainer(File file) {
+	public LocalMod(File file) {
 		if (file.getName().endsWith(".jar")) {
 			try {
 				this.file = file;
@@ -52,7 +52,7 @@ public class ModContainer {
 		return version;
 	}
 
-	public File getFile() {
-		return file;
+	public String getFile() {
+		return file.getPath();
 	}
 }

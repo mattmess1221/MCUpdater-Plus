@@ -9,14 +9,12 @@ import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-import java.util.Map;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
-import com.google.common.collect.Maps;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,16 +23,10 @@ import com.google.gson.JsonObject;
 public class UpdaterMain {
 
 	static Logger logger = LogManager.getLogger("Updater");
-	private List<ModContainer> modContainers = Lists.newArrayList();
-	private URL url;
+	private List<LocalMod> localMods = Lists.newArrayList();
+	private List<RemoteMod> remoteMods = Lists.newArrayList();
 	private File gameDir;
-	private String mcVersion;
-	private String modpack;
-	private String packVersion;
-	private List<String> mods = Lists.newArrayList();
-	private Map<String, String> urls = Maps.newHashMap();
-	private Map<String, String> versions = Maps.newHashMap();
-	private Map<String, String> md5s = Maps.newHashMap();
+	private String[] pack = new String[4]; // modpack, packVersion, mcVersion
 	private boolean flag;
 
 	public UpdaterMain() {
@@ -68,24 +60,24 @@ public class UpdaterMain {
 
 	private void getInfo() {
 		try {
-			String urlstr = this.url.toString() + "/" + modpack + "/"
-					+ packVersion + "/";
+			String urlstr = pack[0] + "/" + pack[1] + "/"
+					+ pack[2] + "/";
 			URL url = new URL(urlstr + "pack.json");
 			InputStream stream = url.openStream();
 			Gson gson = new Gson();
 			JsonObject object = gson.fromJson(new InputStreamReader(stream),
 					JsonObject.class);
 			String mcversion = object.get("mcversion").getAsString();
-			if (mcversion != this.mcVersion)
+			if (mcversion != pack[3])
 				this.flag = true;
 			JsonArray array = object.get("mods").getAsJsonArray();
 			for (JsonElement element : array) {
 				JsonObject mod = element.getAsJsonObject();
 				String modname = mod.get("modid").getAsString();
-				this.mods.add(modname);
-				this.urls.put(modname, mod.get("file").getAsString());
-				this.versions.put(modname, mod.get("version").getAsString());
-				this.md5s.put(modname, mod.get("md5").getAsString());
+				String version = mod.get("version").getAsString();
+				String file = mod.get("file").getAsString();
+				String md5 = mod.get("md5").getAsString();
+				this.remoteMods.add(new RemoteMod(modname, version, file, md5));
 			}
 
 		} catch (MalformedURLException e) {
@@ -96,50 +88,50 @@ public class UpdaterMain {
 	}
 
 	private void compareMods() {
-		for (String modid : mods) {
-			if (!compareContainer(modid))
+		for (RemoteMod remote : remoteMods) {
+			if (!compareContainer(remote))
 				try {
-					downloadMod(modid, null);
+					downloadMod(remote, null);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
 		}
 	}
 
-	private boolean compareContainer(String modid) {
-		for (ModContainer mod : modContainers) {
-			if (modid.equalsIgnoreCase(mod.getModID())) {
-				if (!mod.getVersion().equalsIgnoreCase(versions.get(modid))) {
-					logger.info("Updating " + mod.getName() + " " + mod.getVersion() + " to " + versions.get(modid));
+	private boolean compareContainer(RemoteMod remote) {
+		for (LocalMod local : localMods) {
+			if (remote.getModID().equals(local.getModID())) {
+				if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
+					logger.info("Updating " + local.getName() + " " + local.getVersion() + " to " + remote.getVersion());
 					try {
-						downloadMod(modid, mod.getFile());
+						downloadMod(remote, local);
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
 				} else {
-					logger.info(mod.getModID() + " " + mod.getVersion() + " is up to date.");
+					logger.info(local.getModID() + " " + local.getVersion() + " is up to date.");
 				}
 				return true;
 			}
 		}
-		logger.info(modid + " not found.");
+		logger.info(remote + " not found.");
 		return false;
 	}
 
-	private void downloadMod(String modid, File file)
+	private void downloadMod(RemoteMod remote, LocalMod local)
 			throws MalformedURLException {
 		// rename old file
-		if (file != null) {
-			file.renameTo(new File(file.toString() + ".old"));
+		if (local != null) {
+			new File(local.getFile()).renameTo(new File(local.getFile() + ".old"));
 		}
 		// download new file
 		URL url;
-		String a = urls.get(modid);
+		String a = remote.getFile();
 		if (a.startsWith("http")) {
 			url = new URL(a);
 		} else {
-			url = new URL(this.url.toString() + "/" + modpack + "/"
-					+ packVersion + "/" + a);
+			url = new URL(pack[0] + (pack[0].endsWith("/") ? "" : "/") + pack[1] + "/"
+					+ pack[2] + "/" + a);
 		}
 		File newFile = new File(new File(gameDir, "mods"), url.toString()
 				.split("/")[url.toString().split("/").length - 1]);
@@ -148,23 +140,23 @@ public class UpdaterMain {
 		boolean flag = false;
 		while (i <= 3 && !flag) {
 			try {
-				logger.info("Downloading " + modid + ". (try " + i + ")");
+				logger.info("Downloading " + remote + ". (try " + i + ")");
 				FileUtils.copyURLToFile(url, newFile);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
 			i++;
-			if (checkMD5(newFile, md5s.get(modid))) {
+			if (checkMD5(newFile, remote.getMD5())) {
 				flag = true;
-				logger.info(modid + " MD5 Verified");
+				logger.info(remote + " MD5 Verified");
 			} else {
-				logger.info(modid + " MD5 Failed! Retrying...");
+				logger.info(remote + " MD5 Failed! Retrying...");
 			}
 		}
 	}
 
 	private boolean checkMD5(File newFile, String md5sum) {
-
+		// TODO return true for now
 		return true;
 
 	}
@@ -176,10 +168,10 @@ public class UpdaterMain {
 			JsonObject object = gson.fromJson(new InputStreamReader(is),
 					JsonObject.class);
 
-			this.modpack = object.get("modpack").getAsString();
-			this.packVersion = object.get("version").getAsString();
-			this.url = new URL(object.get("repo").getAsString());
-			this.mcVersion = object.get("mcversion").getAsString();
+			this.pack[0] = object.get("repo").getAsString();
+			this.pack[1] = object.get("modpack").getAsString();
+			this.pack[2] = object.get("version").getAsString();
+			this.pack[3] = object.get("mcversion").getAsString();
 
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
@@ -189,7 +181,7 @@ public class UpdaterMain {
 	private void readMods(File modsDir) {
 		for (File file : modsDir.listFiles())
 			if (file.isFile())
-				modContainers.add(new ModContainer(file));
+				localMods.add(new LocalMod(file));
 	}
 
 }

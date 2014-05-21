@@ -1,6 +1,5 @@
 package mcupdater;
 
-import java.net.URL;
 
 public interface Mod {
 

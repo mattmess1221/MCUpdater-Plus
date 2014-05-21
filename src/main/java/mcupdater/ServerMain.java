@@ -6,29 +6,34 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
+import java.util.logging.Logger;
 
 
 public class ServerMain {
+	
+	private static Logger logger = Logger.getLogger("Server Updater");
 
 	public static void main(final String[] args) throws Exception {
-		new ServerMain().loadMCJar();
-		Thread thread = new Thread("Updater"){
-			public void run(){
-				new UpdaterMain().main(args);
-			}
-		};
-		thread.start();
+		if(new ServerMain().loadMCJar()){
+			new UpdaterMain().main(args);
+		}
+		else {
+			System.out.println("Warning: Minecraft Server not found in user dir.  Unable to update!");
+		}
 	}
 
-	private void loadMCJar() throws IOException{
+	private boolean loadMCJar() throws IOException{
+		boolean mcfound = false;
 		System.out.println("Loading Libraries...");
 		for(File file : new File(System.getProperty("user.dir")).listFiles()){
 			if(file.getName().startsWith("minecraft_server") && file.getName().endsWith(".jar")){
 				addURL(file.toURI().toURL());
+				mcfound = true;
 			} else if (file.isDirectory() && file.getName().equals("libraries")){
 				recursiveLookup(file);
 			}
 		}
+		return mcfound;
 	}
 	
 	private void recursiveLookup(File file) throws MalformedURLException{

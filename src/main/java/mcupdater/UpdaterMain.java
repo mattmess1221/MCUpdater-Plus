@@ -1,17 +1,26 @@
 package mcupdater;
 
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import com.google.gson.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
+import com.google.gson.JsonSyntaxException;
 
 public class UpdaterMain {
 
@@ -21,13 +30,16 @@ public class UpdaterMain {
 	private File gameDir;
 	private String[] pack = new String[4]; // {repo, modpack, version, mcVersion}
 	private boolean flag;
+	private static UpdaterMain instance;
 
 	public UpdaterMain() {
 		gameDir = new File(System.getProperty("user.dir"));
+		instance = this;
 	}
 
 	public UpdaterMain(File file) {
 		gameDir = file;
+		instance = this;
 	}
 
 	public void main(String[] args) {
@@ -55,7 +67,7 @@ public class UpdaterMain {
         String urlstr = "";
         String jsonstr = "";
 		try {
-			urlstr = pack[0] + "/" + pack[1] + "/" + pack[2] + "/";
+			urlstr = getRepo();
 			URL url = new URL(urlstr + "pack.json");
 			InputStream stream = url.openStream();
 			Gson gson = new Gson();
@@ -70,6 +82,11 @@ public class UpdaterMain {
 			String mcversion = object.get("mcversion").getAsString();
 			if (mcversion != pack[3])
 				this.flag = true;
+			try{
+				new Config(object.get("config"), this.gameDir).updateConfigs();
+			}catch(IOException e){
+				logger.error("Something went wrong while downloading configs!");
+			}
 			JsonArray array = object.get("mods").getAsJsonArray();
 			for (JsonElement element : array) {
 				JsonObject mod = element.getAsJsonObject();
@@ -141,8 +158,7 @@ public class UpdaterMain {
 		if (a.startsWith("http")) {
 			url = new URL(a);
 		} else {
-			url = new URL(pack[0] + (pack[0].endsWith("/") ? "" : "/")
-					+ pack[1] + "/" + pack[2] + "/" + a);
+			url = new URL(getRepo() + a);
 		}
 		File newFile = new File(new File(gameDir, "mods"), url.toString()
 				.split("/")[url.toString().split("/").length - 1]);
@@ -207,4 +223,11 @@ public class UpdaterMain {
 			}
 	}
 
+	public String getRepo(){
+		return pack[0] +( pack[0].endsWith("/") ? "" : "/" )+ pack[1] + "/" + pack[2] + "/";
+	}
+	
+	public static UpdaterMain getInstance(){
+		return instance;
+	}
 }

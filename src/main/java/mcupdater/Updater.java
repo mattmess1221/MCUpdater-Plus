@@ -2,6 +2,7 @@ package mcupdater;
 
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
+
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -15,6 +16,7 @@ public class Updater implements ITweaker {
     private List<String> standaloneArgs;
     private File gameDirectory;
 
+	@SuppressWarnings("unchecked")
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir,
 			String profile) {
@@ -26,7 +28,7 @@ public class Updater implements ITweaker {
             Launch.blackboard.put("launchArgs",launchArgs);
         }else{
             if(Launch.blackboard.get("launchArgs") instanceof Map){
-                launchArgs = (Map) Launch.blackboard.get("launchArgs");
+                launchArgs = (Map<String, String>) Launch.blackboard.get("launchArgs");
             }else{
                 throw(new RuntimeException());
             }

@@ -6,12 +6,9 @@ import java.lang.reflect.Method;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
-import java.util.logging.Logger;
 
 
 public class ServerMain {
-	
-	private static Logger logger = Logger.getLogger("Server Updater");
 
 	public static void main(final String[] args) throws Exception {
 		if(new ServerMain().loadMCJar()){

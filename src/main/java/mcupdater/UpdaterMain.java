@@ -26,7 +26,7 @@ public class UpdaterMain {
 	private List<LocalMod> localMods = Lists.newArrayList();
 	private List<RemoteMod> remoteMods = Lists.newArrayList();
 	private File gameDir;
-	private String[] pack = new String[4]; // modpack, packVersion, mcVersion
+	private String[] pack = new String[4]; // {repo, modpack, version, mcVersion}
 	private boolean flag;
 
 	public UpdaterMain() {
@@ -60,8 +60,7 @@ public class UpdaterMain {
 
 	private void getInfo() {
 		try {
-			String urlstr = pack[0] + "/" + pack[1] + "/"
-					+ pack[2] + "/";
+			String urlstr = pack[0] + "/" + pack[1] + "/" + pack[2] + "/";
 			URL url = new URL(urlstr + "pack.json");
 			InputStream stream = url.openStream();
 			Gson gson = new Gson();
@@ -102,14 +101,16 @@ public class UpdaterMain {
 		for (LocalMod local : localMods) {
 			if (remote.getModID().equals(local.getModID())) {
 				if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
-					logger.info("Updating " + local.getName() + " " + local.getVersion() + " to " + remote.getVersion());
+					logger.info("Updating " + local.getName() + " "
+							+ local.getVersion() + " to " + remote.getVersion());
 					try {
 						downloadMod(remote, local);
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
 				} else {
-					logger.info(local.getModID() + " " + local.getVersion() + " is up to date.");
+					logger.info(local.getModID() + " " + local.getVersion()
+							+ " is up to date.");
 				}
 				return true;
 			}
@@ -122,7 +123,8 @@ public class UpdaterMain {
 			throws MalformedURLException {
 		// rename old file
 		if (local != null) {
-			new File(local.getFile()).renameTo(new File(local.getFile() + ".old"));
+			new File(local.getFile()).renameTo(new File(local.getFile()
+					+ ".old"));
 		}
 		// download new file
 		URL url;
@@ -130,8 +132,8 @@ public class UpdaterMain {
 		if (a.startsWith("http")) {
 			url = new URL(a);
 		} else {
-			url = new URL(pack[0] + (pack[0].endsWith("/") ? "" : "/") + pack[1] + "/"
-					+ pack[2] + "/" + a);
+			url = new URL(pack[0] + (pack[0].endsWith("/") ? "" : "/")
+					+ pack[1] + "/" + pack[2] + "/" + a);
 		}
 		File newFile = new File(new File(gameDir, "mods"), url.toString()
 				.split("/")[url.toString().split("/").length - 1]);
@@ -179,9 +181,21 @@ public class UpdaterMain {
 	}
 
 	private void readMods(File modsDir) {
+		modsDir.mkdirs();
 		for (File file : modsDir.listFiles())
-			if (file.isFile())
-				localMods.add(new LocalMod(file));
+			try {
+				if (file.isFile())
+					localMods.add(new LocalMod(file));
+				else if(file.getName().equals(pack[3])){
+					for (File file1 : file.listFiles()) {
+						if (file1.isFile()) {
+							localMods.add(new LocalMod(file1));
+						}
+					}
+				}
+			} catch (IOException e) {
+
+			}
 	}
 
 }

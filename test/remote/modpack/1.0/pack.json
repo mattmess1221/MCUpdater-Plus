@@ -1,5 +1,9 @@
 {
 	"mcversion": "1.7.2",
+	"config": {
+		"file": "config.zip",
+		"version": "1"
+	},
 	"mods":[
 		{
 			"modid": "EE3",

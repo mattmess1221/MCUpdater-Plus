@@ -28,6 +28,7 @@ buildscript {
 }
 
 jar {
+	classifier = getCommitHash()
 	manifest{
 		attributes 'Main-Class': mainClassName
 	}
@@ -42,3 +43,14 @@ dependencies {
 
 }
 
+def getCommitHash() {
+    def gitFolder = "$projectDir/.git/"
+    def takeFromHash = 12
+    def head = new File(gitFolder + "HEAD").text.split(":")
+    def isCommit = head.length == 1
+ 
+    if(isCommit) return head[0].trim().take(takeFromHash)
+ 
+    def refHead = new File(gitFolder + head[1].trim())
+    refHead.text.trim().take takeFromHash
+}

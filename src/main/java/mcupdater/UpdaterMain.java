@@ -1,24 +1,17 @@
 package mcupdater;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
+
+import com.google.gson.*;
 
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 public class UpdaterMain {
 
@@ -59,12 +52,20 @@ public class UpdaterMain {
 	}
 
 	private void getInfo() {
+        String urlstr = "";
+        String jsonstr = "";
 		try {
-			String urlstr = pack[0] + "/" + pack[1] + "/" + pack[2] + "/";
+			urlstr = pack[0] + "/" + pack[1] + "/" + pack[2] + "/";
 			URL url = new URL(urlstr + "pack.json");
 			InputStream stream = url.openStream();
 			Gson gson = new Gson();
-			JsonObject object = gson.fromJson(new InputStreamReader(stream),
+            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+            StringBuilder sb = new StringBuilder();
+            String line;
+            while((line = br.readLine())!=null)
+                sb.append(line);
+            jsonstr = sb.toString();
+			JsonObject object = gson.fromJson(jsonstr,
 					JsonObject.class);
 			String mcversion = object.get("mcversion").getAsString();
 			if (mcversion != pack[3])
@@ -80,9 +81,17 @@ public class UpdaterMain {
 			}
 
 		} catch (MalformedURLException e) {
+            logger.error("Bad URL in modpack.json");
 			e.printStackTrace();
+            throw(new RuntimeException());
 		} catch (IOException e) {
-			e.printStackTrace();
+            logger.error(String.format("Could not open modpack definition %s",urlstr));
+            e.printStackTrace();
+            throw(new RuntimeException());
+        } catch (JsonSyntaxException e) {
+            logger.error(String.format("Bad JSON in %spack.json\n%s",urlstr,jsonstr));
+            e.printStackTrace();
+            throw(new RuntimeException());
 		}
 	}
 

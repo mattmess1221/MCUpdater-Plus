@@ -11,6 +11,11 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import mcupdater.local.LocalForgeMod;
+import mcupdater.local.LocalLiteMod;
+import mcupdater.local.LocalMod;
+import mcupdater.remote.RemoteMod;
+
 import org.apache.commons.io.FileUtils;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -28,7 +33,8 @@ public class UpdaterMain {
 	private List<LocalMod> localMods = Lists.newArrayList();
 	private List<RemoteMod> remoteMods = Lists.newArrayList();
 	private File gameDir;
-	private String[] pack = new String[4]; // {repo, modpack, version, mcVersion}
+	private String[] pack = new String[4]; // {repo, modpack, version,
+											// mcVersion}
 	private boolean flag;
 	private static UpdaterMain instance;
 
@@ -64,51 +70,57 @@ public class UpdaterMain {
 	}
 
 	private void getInfo() {
-        String urlstr = "";
-        String jsonstr = "";
+		String urlstr = "";
+		String jsonstr = "";
 		try {
 			urlstr = getRepo();
 			URL url = new URL(urlstr + "pack.json");
 			InputStream stream = url.openStream();
 			Gson gson = new Gson();
-            BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-            StringBuilder sb = new StringBuilder();
-            String line;
-            while((line = br.readLine())!=null)
-                sb.append(line);
-            jsonstr = sb.toString();
-			JsonObject object = gson.fromJson(jsonstr,
-					JsonObject.class);
+			BufferedReader br = new BufferedReader(
+					new InputStreamReader(stream));
+			StringBuilder sb = new StringBuilder();
+			String line;
+			while ((line = br.readLine()) != null)
+				sb.append(line);
+			jsonstr = sb.toString();
+			JsonObject object = gson.fromJson(jsonstr, JsonObject.class);
 			String mcversion = object.get("mcversion").getAsString();
 			if (mcversion != pack[3])
 				this.flag = true;
-			try{
+			try {
 				new Config(object.get("config"), this.gameDir).updateConfigs();
-			}catch(IOException e){
+			} catch (IOException e) {
 				logger.error("Something went wrong while downloading configs!");
 			}
 			JsonArray array = object.get("mods").getAsJsonArray();
 			for (JsonElement element : array) {
 				JsonObject mod = element.getAsJsonObject();
 				String modname = mod.get("modid").getAsString();
-				String version = mod.get("version").getAsString();
+				String version = "";
+				if(mod.get("type").getAsString().equals("forge"))
+					version = mod.get("version").getAsString();
+				else if (mod.get("type").getAsString().equals("liteloader"))
+					version = mod.get("revision").getAsString();
 				String file = mod.get("file").getAsString();
 				String md5 = mod.get("md5").getAsString();
 				this.remoteMods.add(new RemoteMod(modname, version, file, md5));
 			}
 
 		} catch (MalformedURLException e) {
-            logger.error("Bad URL in modpack.json");
+			logger.error("Bad URL in modpack.json");
 			e.printStackTrace();
-            throw(new RuntimeException());
+			throw (new RuntimeException());
 		} catch (IOException e) {
-            logger.error(String.format("Could not open modpack definition %s",urlstr));
-            e.printStackTrace();
-            throw(new RuntimeException());
-        } catch (JsonSyntaxException e) {
-            logger.error(String.format("Bad JSON in %spack.json\n%s",urlstr,jsonstr));
-            e.printStackTrace();
-            throw(new RuntimeException());
+			logger.error(String.format("Could not open modpack definition %s",
+					urlstr));
+			e.printStackTrace();
+			throw (new RuntimeException());
+		} catch (JsonSyntaxException e) {
+			logger.error(String.format("Bad JSON in %spack.json\n%s", urlstr,
+					jsonstr));
+			e.printStackTrace();
+			throw (new RuntimeException());
 		}
 	}
 
@@ -125,7 +137,7 @@ public class UpdaterMain {
 
 	private boolean compareContainer(RemoteMod remote) {
 		for (LocalMod local : localMods) {
-			if (remote.getModID().equals(local.getModID())) {
+			if (remote.getModID().equalsIgnoreCase(local.getModID())) {
 				if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
 					logger.info("Updating " + local.getName() + " "
 							+ local.getVersion() + " to " + remote.getVersion());
@@ -135,13 +147,16 @@ public class UpdaterMain {
 						e.printStackTrace();
 					}
 				} else {
-					logger.info(local.getModID() + " " + local.getVersion()
-							+ " is up to date.");
+					String version;
+					if(local instanceof LocalLiteMod)
+						version = ((LocalLiteMod)local).getReadableVersion();
+					else version = local.getVersion();
+					logger.info(local.getModID() + " " + version + " is up to date.");
 				}
 				return true;
 			}
 		}
-		logger.info(remote + " not found.");
+		logger.info(remote.getModID() + " not found.");
 		return false;
 	}
 
@@ -167,7 +182,7 @@ public class UpdaterMain {
 		boolean flag = false;
 		while (i <= 3 && !flag) {
 			try {
-				logger.info("Downloading " + remote + ". (try " + i + ")");
+				logger.info("Downloading " + remote.getModID() + ". (try " + i + ")");
 				FileUtils.copyURLToFile(url, newFile);
 			} catch (IOException e) {
 				e.printStackTrace();
@@ -210,24 +225,32 @@ public class UpdaterMain {
 		for (File file : modsDir.listFiles())
 			try {
 				if (file.isFile())
-					localMods.add(new LocalMod(file));
-				else if(file.getName().equals(pack[3])){
+					addMod(file);
+				else if (file.getName().equals(pack[3])) {
 					for (File file1 : file.listFiles()) {
 						if (file1.isFile()) {
-							localMods.add(new LocalMod(file1));
+							addMod(file1);
 						}
 					}
 				}
 			} catch (IOException e) {
-
+				logger.error("Unable to read mod file " + file.getName());
 			}
 	}
 
-	public String getRepo(){
-		return pack[0] +( pack[0].endsWith("/") ? "" : "/" )+ pack[1] + "/" + pack[2] + "/";
+	private void addMod(File file) throws IOException {
+		if (file.getName().endsWith(".litemod")) {
+			localMods.add(new LocalLiteMod(file));
+		} else if(file.getName().endsWith(".jar"))
+			localMods.add(new LocalForgeMod(file));
 	}
-	
-	public static UpdaterMain getInstance(){
+
+	public String getRepo() {
+		return pack[0] + (pack[0].endsWith("/") ? "" : "/") + pack[1] + "/"
+				+ pack[2] + "/";
+	}
+
+	public static UpdaterMain getInstance() {
 		return instance;
 	}
 }

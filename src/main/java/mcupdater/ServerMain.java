@@ -1,8 +1,5 @@
 package mcupdater;
 
-import joptsimple.OptionParser;
-import joptsimple.OptionSet;
-
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Method;

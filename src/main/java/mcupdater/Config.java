@@ -3,7 +3,7 @@ package mcupdater;
 import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.MalformedURLException;
@@ -46,7 +46,7 @@ public class Config {
 	private String getLocalVersion(File gameDir) throws IOException {
 		File version = new File(new File(gameDir, "config"), "version");
 		if (!version.exists())
-			return null;
+			return "";
 		BufferedReader br = new BufferedReader(new InputStreamReader(
 				new FileInputStream(version)));
 		StringBuilder sb = new StringBuilder();
@@ -100,11 +100,12 @@ public class Config {
 				} else {
 					destFile.getParentFile().mkdirs();
 					destFile.createNewFile();
-					FileOutputStream stream = new FileOutputStream(destFile);
-					while (zip.available() > 0) {
-						stream.write(zip.read());
+					FileWriter writer = new FileWriter(destFile);
+					writer.flush();
+					while (zip.available() > 1) { // Don't read EOF
+						writer.write(zip.read());
 					}
-					stream.close();
+					writer.close();
 				}
 			} catch (IOException e) {
 				UpdaterMain.logger.error("Couldn't save " + currentEntry);
@@ -117,8 +118,8 @@ public class Config {
 	private void saveVersion() throws IOException {
 		File version = new File(new File(gameDir, "config"), "version");
 		version.createNewFile();
-		FileOutputStream save = new FileOutputStream(version);
-		save.write(remoteVersion.getBytes());
+		FileWriter save = new FileWriter(version);
+		save.write(remoteVersion);
 		save.close();
 	}
 

@@ -9,19 +9,67 @@
 			"modid": "EE3",
 			"version": "0.2",
 			"file": "mods/EquivalentExchange3-0.2.jar",
+			"type:" "forge",
 			"md5": "084ea47ec23e024fec1ea12448684b7c"
 		},
 		{
 			"modid": "BuildCraft|Core",
 			"version": "5.0.5",
 			"file": "mods/buildcraft-5.0.5.jar",
+			"type": "forge",
 			"md5": "f6c5eb3eec0cf5ba3871828d718a75ed"
 		},
 		{
 			"modid": "Thaumcraft",
 			"version": "1.7.2-4.1.1.12",
 			"file": "https://dl.dropboxusercontent.com/u/47135879/Thaumcraft-1.7.2-4.1.1.12.jar",
+			"type": "forge",
 			"md5": "a23999f97590c909833263f452ab6104"
+		},
+		{
+			"modid": "voxelcam",
+			"revision": "24"
+			"file": "http://applefreak.voxelmodpack.com/moduploads/voxelcam/mod_VoxelCam_1.3.0_mc1.7.2.litemod",
+			"type": "liteloader",
+			"md5": "f9bff3178201807a535a83af0be70466"
+		}
+	],
+	"tweakClasses:[
+		"cpw.mods.fml.common.launcher.FMLTweaker",
+		"com.mumfrey.liteloader.launch.LiteLoaderTweaker"
+	],
+	"additionalArguments": "--foo bar"
+	"libraries": [
+		{
+			"group": "net.minecraftforge",
+			"name": "forge",
+			"version": "10.11.1.1060",
+			"url": "http://file.minecraftforge.net/maven/",
+			"tweakclass": 
+		},
+		{
+			"group": "com.mumfrey",
+			"name": "liteloader",
+			"version": "1.7.2",
+			"url": "http://dl.liteloader.com/versions/",
+			"tweakclass": 
+		},
+		{
+			"group": "org.ow2.asm",
+			"name": "asm-all",
+			"version": "4.1",
+		},
+		{
+			"group": "org.scala-lang",
+			"name": "scala-library",
+			"version": "2.10.2",
+			"url": "http://files.minecraftforge.net/maven/"
+		},
+		{
+			"group": "org.scala-lang",
+			"name": "scala-compiler",
+			"version": "2.10.2",
+			"url": "http://files.minecraftforge.net/maven/"
 		}
 	]
 }

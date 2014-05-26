@@ -38,7 +38,7 @@
 		"cpw.mods.fml.common.launcher.FMLTweaker",
 		"com.mumfrey.liteloader.launch.LiteLoaderTweaker"
 	],
-	"additionalArguments": "--foo bar"
+	"additionalArguments": "--foo bar",
 	"libraries": [
 		{
 			"group": "net.minecraftforge",

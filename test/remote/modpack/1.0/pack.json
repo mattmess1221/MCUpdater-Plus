@@ -9,7 +9,7 @@
 			"modid": "EE3",
 			"version": "0.2",
 			"file": "mods/EquivalentExchange3-0.2.jar",
-			"type:" "forge",
+			"type": "forge",
 			"md5": "084ea47ec23e024fec1ea12448684b7c"
 		},
 		{
@@ -28,13 +28,13 @@
 		},
 		{
 			"modid": "voxelcam",
-			"revision": "24"
+			"revision": "24",
 			"file": "http://applefreak.voxelmodpack.com/moduploads/voxelcam/mod_VoxelCam_1.3.0_mc1.7.2.litemod",
 			"type": "liteloader",
 			"md5": "f9bff3178201807a535a83af0be70466"
 		}
 	],
-	"tweakClasses:[
+	"tweakClasses":[
 		"cpw.mods.fml.common.launcher.FMLTweaker",
 		"com.mumfrey.liteloader.launch.LiteLoaderTweaker"
 	],
@@ -44,20 +44,18 @@
 			"group": "net.minecraftforge",
 			"name": "forge",
 			"version": "10.11.1.1060",
-			"url": "http://file.minecraftforge.net/maven/",
-			"tweakclass": 
+			"url": "http://file.minecraftforge.net/maven/"
 		},
 		{
 			"group": "com.mumfrey",
 			"name": "liteloader",
 			"version": "1.7.2",
-			"url": "http://dl.liteloader.com/versions/",
-			"tweakclass": 
+			"url": "http://dl.liteloader.com/versions/"
 		},
 		{
 			"group": "org.ow2.asm",
 			"name": "asm-all",
-			"version": "4.1",
+			"version": "4.1"
 		},
 		{
 			"group": "org.scala-lang",

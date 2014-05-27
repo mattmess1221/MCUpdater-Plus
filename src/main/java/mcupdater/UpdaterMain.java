@@ -98,7 +98,7 @@ public class UpdaterMain {
 				JsonObject mod = element.getAsJsonObject();
 				String modname = mod.get("modid").getAsString();
 				String version = "";
-				if(mod.get("type").getAsString().equals("forge"))
+				if(!mod.has("type") || mod.get("type").getAsString().equals("forge"))
 					version = mod.get("version").getAsString();
 				else if (mod.get("type").getAsString().equals("liteloader"))
 					version = mod.get("revision").getAsString();

@@ -21,6 +21,9 @@ import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
 import com.google.common.collect.Lists;
+import com.google.common.hash.HashCode;
+import com.google.common.hash.Hashing;
+import com.google.common.io.Files;
 import com.google.gson.Gson;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -103,7 +106,9 @@ public class UpdaterMain {
 				else if (mod.get("type").getAsString().equals("liteloader"))
 					version = mod.get("revision").getAsString();
 				String file = mod.get("file").getAsString();
-				String md5 = mod.get("md5").getAsString();
+				String md5 = null;
+				if(mod.has("md5"))
+					md5 = mod.get("md5").getAsString();
 				this.remoteMods.add(new RemoteMod(modname, version, file, md5));
 			}
 
@@ -188,19 +193,29 @@ public class UpdaterMain {
 				e.printStackTrace();
 			}
 			i++;
-			if (checkMD5(newFile, remote.getMD5())) {
-				flag = true;
-				logger.info(remote + " MD5 Verified");
-			} else {
-				logger.info(remote + " MD5 Failed! Retrying...");
+			if(!remote.hasHash())
+				break;
+			try {
+				if (checkMD5(newFile, remote.getMD5())) {
+					flag = true;
+					logger.info(remote.getModID() + " MD5 Verified");
+				} else {
+					newFile.delete();
+					logger.info(remote.getModID() + " MD5 Failed!");
+				}
+			} catch (FileNotFoundException e) {
+				logger.warn(remote.getFile() + " not found!");
+				e.printStackTrace();
+			} catch (IOException e) {
+				logger.warn("Unable to read " + remote.getFile());
+				e.printStackTrace();
 			}
 		}
 	}
 
-	private boolean checkMD5(File newFile, String md5sum) {
-		// TODO return true for now
-		return true;
-
+	private boolean checkMD5(File file, String md5sum) throws IOException {
+		HashCode hashCode = Files.hash(file, Hashing.md5());
+		return hashCode.toString().equals(md5sum);
 	}
 
 	private void readJson(File json) throws MalformedURLException {

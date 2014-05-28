@@ -36,5 +36,9 @@ public class RemoteMod implements IMod{
 	public String getMD5(){
 		return this.md5;
 	}
+	
+	public boolean hasHash(){
+		return md5 != null;
+	}
 
 }

@@ -1,5 +1,9 @@
+[![Build Status](http://ci.jam-craft.net/job/MCUpdater/badge/icon)](http://ci.jam-craft.net/job/MCUpdater/)
+
+
 Minecraft Modpack Updater
 ====
+
 This is a Minecraft mod utility, installed as a tweak, to automatically download or update mods in a modpack. It doesn't rely on Minecraft code, so it should be compatible with all versions.
 
 It works similarly to VoxelUpdate, but with key differences.  Namely, forge compatibility and the ability to specify an absolute URL instead of a relative one.
@@ -10,6 +14,8 @@ To install this on the client, copy the built .jar to .minecraft/libraries/updat
 Afterwards, edit the mc version json which you want to install this in.  Add the library to the libraries and the arguments `--tweakClass mcupdater.Updater` BEFORE forge in the minecraftArguments element.
 
 Finally, copy the modpack.json you were either provided or created to the minecraft game directory.
+
+To install on a server, simply copy the file to the directory your server jar is in and script to run before it starts.  The updater uses libraries in the server jar, so it will need to load the jar. Its name needs to start with `minecraft_server` in order for it to work.
 
 Setting Up the Jsons
 ===

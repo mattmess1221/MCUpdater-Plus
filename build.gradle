@@ -12,6 +12,7 @@ def build = getGitCommits()
 mainClassName = 'mcupdater.ServerMain'
 version = major + "." + minor + "." + build
 group = 'mcupdater'
+archivesBaseName = 'MCUpdaterPlus'
 
 repositories {
 	mavenCentral()

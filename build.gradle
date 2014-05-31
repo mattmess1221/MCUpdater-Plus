@@ -4,13 +4,10 @@ apply plugin: 'eclipse'
 apply plugin: 'maven'
 apply plugin: 'application'
 apply plugin: 'launch4j'
+apply plugin: 'grgit-release'
 
-def major = "1"
-def minor = "0"
-def build = getGitCommits()
 
 mainClassName = 'mcupdater.ServerMain'
-version = major + "." + minor + "." + build
 group = 'mcupdater'
 archivesBaseName = 'MCUpdaterPlus'
 
@@ -29,6 +26,7 @@ buildscript {
 	}
 	dependencies {
 		classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
+        classpath group: 'org.ajoberstar', name: 'gradle-git', version: '0.8.0'
 	}
 }
 
@@ -47,11 +45,3 @@ dependencies {
 
 }
 
-def getGitCommits(){
-	def stdout = new ByteArrayOutputStream()
-	exec {
-		commandLine 'git', 'rev-list', 'HEAD', '--count'
-		standardOutput = stdout
-	}
-	return Integer.parseInt(stdout.toString().trim())
-}

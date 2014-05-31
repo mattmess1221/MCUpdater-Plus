@@ -6,6 +6,7 @@ apply plugin: 'application'
 apply plugin: 'launch4j'
 apply plugin: 'grgit-release'
 
+import org.ajoberstar.grgit.*
 
 mainClassName = 'mcupdater.ServerMain'
 group = 'mcupdater'
@@ -43,5 +44,9 @@ dependencies {
 	compile group: 'commons-io', name: 'commons-io', version: '2.4' 
 	compile group: 'com.google.guava', name: 'guava', version: '17.0'
 
+}
+
+release {
+    grgit = Grgit.open(project.file('.'))
 }
 

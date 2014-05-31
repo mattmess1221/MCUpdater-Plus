@@ -25,6 +25,12 @@ public class ServerMain {
 
 	private boolean loadMCJar() throws IOException{
 		boolean mcfound = false;
+		try {
+			Class.forName("com.google.gson.Gson");
+			System.out.println("Found a dependency on classpath.  Assuming everything else it there.");
+			return true;
+		} catch (ClassNotFoundException e){
+		}
 		System.out.println("Loading Libraries...");
 		for(File file : new File(System.getProperty("user.dir")).listFiles()){
 			if(file.getName().startsWith(mcjarprefix) && file.getName().endsWith(".jar")){

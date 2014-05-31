@@ -30,13 +30,11 @@ public class Config {
 	 *            the Game Directory
 	 * @throws IOException
 	 */
-	public Config(JsonElement jsonElement, File gameDir) throws IOException {
-		this.gameDir = gameDir;
+	public Config(JsonElement jsonElement) throws IOException {
+		this.gameDir = UpdaterMain.gameDir;
 		localVersion = getLocalVersion(gameDir);
-		UpdaterMain.logger.info(localVersion);
 		remoteVersion = getRemoteVersion(getJsonObject(jsonElement));
-		UpdaterMain.logger.info(remoteVersion);
-		remoteFile = getRemoteFile(getJsonObject(jsonElement));
+		remoteFile = getRemoteFile(getJsonObject(jsonElement), UpdaterMain.getInstance().local.getRemotePackURL().toString());
 		shouldUpdate = !localVersion.equals(remoteVersion);
 		if (shouldUpdate) {
 			UpdaterMain.logger.info("Config updates avaliable");
@@ -63,14 +61,14 @@ public class Config {
 		return config.get("version").getAsString();
 	}
 
-	private URL getRemoteFile(JsonObject object) throws MalformedURLException {
+	private URL getRemoteFile(JsonObject object, String repo) throws MalformedURLException {
 		if (object == null)
 			return null;
 		String url = object.get("file").getAsString();
 		if (url.startsWith("http")) {
 			return new URL(url);
 		}
-		return new URL(UpdaterMain.getInstance().getRepo() + url);
+		return new URL(repo + url);
 	}
 
 	private JsonObject getJsonObject(JsonElement jsonElement) {
@@ -86,14 +84,14 @@ public class Config {
 		}
 		UpdaterMain.logger.info("Downloading Configs.");
 		ZipInputStream zip = new ZipInputStream(remoteFile.openStream());
-		while (true) {
+		
+		ZipEntry entry = zip.getNextEntry();
+		while (entry != null) {
 			String currentEntry = null;
 			try {
-				ZipEntry entry = zip.getNextEntry();
-				if (entry == null)
-					break;
 				currentEntry = entry.getName();
-				System.out.println(currentEntry);
+				if(!currentEntry.endsWith("/"))
+				UpdaterMain.logger.info("Extracting " + currentEntry);
 				File destFile = new File(gameDir.getPath() + "/" + entry.getName());
 				if (entry.isDirectory()) {
 					destFile.mkdirs();
@@ -101,15 +99,18 @@ public class Config {
 					destFile.getParentFile().mkdirs();
 					destFile.createNewFile();
 					FileWriter writer = new FileWriter(destFile);
-					writer.flush();
-					while (zip.available() > 1) { // Don't read EOF
-						writer.write(zip.read());
+					while (zip.available() == 1) {
+						int read = zip.read();
+						if(read == -1) // Don't write EOF
+							break;
+						writer.write(read);
 					}
 					writer.close();
 				}
 			} catch (IOException e) {
 				UpdaterMain.logger.error("Couldn't save " + currentEntry);
 			}
+			entry = zip.getNextEntry();
 		}
 		zip.close();
 		saveVersion();

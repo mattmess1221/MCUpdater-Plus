@@ -27,7 +27,7 @@ public class ServerMain {
 		boolean mcfound = false;
 		try {
 			Class.forName("com.google.gson.Gson");
-			System.out.println("Found a dependency on classpath.  Assuming everything else it there.");
+			System.out.println("Found a dependency on classpath.  Skipping loading libraries");
 			return true;
 		} catch (ClassNotFoundException e){
 		}

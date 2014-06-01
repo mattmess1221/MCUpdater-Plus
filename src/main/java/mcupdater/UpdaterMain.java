@@ -82,6 +82,10 @@ public class UpdaterMain {
 
 	private void compareMods() {
 		for (RemoteMod remote : this.remote.getModsList()) {
+			if(!remote.isEnabled()){
+				logger.info("Skipping " + remote.getModID());
+				continue;
+			}
 			if (!compareContainer(remote))
 				try {
 					remote.downloadMod(null);

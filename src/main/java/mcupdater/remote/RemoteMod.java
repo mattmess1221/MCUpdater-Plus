@@ -25,6 +25,8 @@ public abstract class RemoteMod implements IMod{
 	private String url;
 	private String md5;
 	private URL repo;
+	private boolean enabled;
+	private UpdaterMain mcup = UpdaterMain.getInstance();
 	
 	public RemoteMod(JsonObject object){
 		
@@ -32,6 +34,8 @@ public abstract class RemoteMod implements IMod{
 			this.url = object.get("file").getAsString();
 			this.md5 = object.get("md5").getAsString();
 			this.repo = UpdaterMain.getInstance().local.getRemotePackURL();
+			
+			enabled = !mcup.local.isDisabled(modid);
 	}
 	
 	@Override
@@ -55,6 +59,10 @@ public abstract class RemoteMod implements IMod{
 	
 	public boolean hasHash(){
 		return md5 != null;
+	}
+	
+	public boolean isEnabled(){
+		return enabled;
 	}
 	
 	public void downloadMod(LocalMod local)

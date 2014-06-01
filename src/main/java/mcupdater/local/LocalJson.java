@@ -12,11 +12,14 @@ import java.net.URL;
 import mcupdater.AbstractJson;
 import mcupdater.remote.RemoteJson;
 
+import com.google.gson.JsonArray;
+
 public class LocalJson extends AbstractJson{
 
 	private String modpack;
 	private String version;
 	private String repo;
+	private String[] disabled;
 	
 	
 	public LocalJson(Reader json) throws NullPointerException{
@@ -24,6 +27,11 @@ public class LocalJson extends AbstractJson{
 		modpack = object.get("modpack").getAsString();
 		version = object.get("version").getAsString();
 		repo = object.get("repo").getAsString();
+		
+		JsonArray array = object.get("disabled").getAsJsonArray();
+		disabled = new String[array.size()];
+		for(int i = 0; i < array.size(); i++)
+			disabled[i] = array.get(i).getAsString();
 	}
 	
 	public LocalJson(File file) throws NullPointerException, FileNotFoundException{
@@ -49,6 +57,13 @@ public class LocalJson extends AbstractJson{
 			e.printStackTrace();
 			return null;
 		}
+	}
+	
+	public boolean isDisabled(String modid){
+		for(String mod : disabled)
+			if(mod.equals(modid))
+				return true;
+		return false;
 	}
 	
 	private URL getRemoteJson() throws MalformedURLException{

@@ -28,10 +28,12 @@ public class LocalJson extends AbstractJson{
 		version = object.get("version").getAsString();
 		repo = object.get("repo").getAsString();
 		
-		JsonArray array = object.get("disabled").getAsJsonArray();
-		disabled = new String[array.size()];
-		for(int i = 0; i < array.size(); i++)
-			disabled[i] = array.get(i).getAsString();
+		if(object.has("disabled")){
+			JsonArray array = object.get("disabled").getAsJsonArray();
+			disabled = new String[array.size()];
+			for(int i = 0; i < array.size(); i++)
+				disabled[i] = array.get(i).getAsString();
+		}
 	}
 	
 	public LocalJson(File file) throws NullPointerException, FileNotFoundException{

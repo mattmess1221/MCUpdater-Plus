@@ -33,7 +33,7 @@ public abstract class RemoteMod implements IMod{
 			this.modid = object.get("modid").getAsString();
 			this.url = object.get("file").getAsString();
 			this.md5 = object.get("md5").getAsString();
-			this.repo = UpdaterMain.getInstance().local.getRemotePackURL();
+			this.repo = mcup.local.getRemotePackURL();
 			
 			enabled = !mcup.local.isDisabled(modid);
 	}

@@ -24,6 +24,9 @@ public class LocalForgeMod extends LocalMod{
 				mcmod = zip.getInputStream(entry);
 				break;
 			}
+		}
+		if(mcmod == null){
+			zip.close();
 			throw new IOException("mcmod.info not found!");
 		}
 		JsonArray array = gson.fromJson(new InputStreamReader(mcmod), JsonArray.class);

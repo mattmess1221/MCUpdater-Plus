@@ -43,8 +43,8 @@
 		{
 			"group": "net.minecraftforge",
 			"name": "forge",
-			"version": "10.11.1.1060",
-			"url": "http://file.minecraftforge.net/maven/"
+			"version": "1.7.2-10.12.1.1060",
+			"url": "http://files.minecraftforge.net/maven/"
 		},
 		{
 			"group": "com.mumfrey",

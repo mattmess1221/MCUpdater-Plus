@@ -10,23 +10,13 @@ import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.Lists;
-
 public class Updater implements ITweaker {
 
 	private UpdaterMain mcup;
-	private List<String> launchArgs = Lists.newArrayList();
 	
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir,
 			String profile) {
-		launchArgs.addAll(args);
-		launchArgs.addAll(ImmutableList.of("--gameDir", gameDir.getPath(), "--assetsDir", assetsDir.getPath()));
-		if(!args.contains("--accessToken"))
-			launchArgs.addAll(ImmutableList.of("--accessToken", "accessToken"));
-		if(!args.contains("--version"))
-			launchArgs.addAll(ImmutableList.of("--version", profile));
 		
 		mcup = new UpdaterMain(gameDir);
 		mcup.main(args.toArray(new String[args.size()]));
@@ -71,7 +61,7 @@ public class Updater implements ITweaker {
 
 	@Override
 	public String[] getLaunchArguments() {
-        return launchArgs.toArray(new String[launchArgs.size()]);
+		return new String[0];
 	}
 
 	@SuppressWarnings("unchecked")

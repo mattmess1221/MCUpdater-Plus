@@ -8,6 +8,7 @@ import java.util.List;
 
 import mcupdater.local.LocalForgeMod;
 import mcupdater.local.LocalJson;
+import mcupdater.local.LocalLibrary;
 import mcupdater.local.LocalLiteMod;
 import mcupdater.local.LocalMod;
 import mcupdater.remote.RemoteJson;
@@ -23,10 +24,11 @@ import com.google.gson.JsonSyntaxException;
 public class UpdaterMain {
 
 	public static Logger logger = LogManager.getLogger("Updater");
-	private List<LocalMod> localMods = Lists.newArrayList();
+	public List<LocalMod> localMods = Lists.newArrayList();
+	public List<LocalLibrary> localLibraries = Lists.newArrayList();
 	public static File gameDir;
-	public RemoteJson remote;
-	public LocalJson local;
+	private RemoteJson remote;
+	private LocalJson local;
 	private static UpdaterMain instance;
 
 	public UpdaterMain() {
@@ -158,5 +160,34 @@ public class UpdaterMain {
 		if(instance == null)
 			instance = new UpdaterMain();
 		return instance;
+	}
+	
+	public LocalJson getLocalJson(){
+		return local;
+	}
+	
+	public RemoteJson getRemoteJson(){
+		return remote;
+	}
+
+	public void readLibraries(File file) {
+		List<File> libs = getRecursiveChildren(file);
+		for(File lib : libs){
+			localLibraries.add(new LocalLibrary(lib));
+		}
+	}
+	
+	private List<File> getRecursiveChildren(File file){
+		List<File> files = Lists.newArrayList();
+		if(file.exists())
+			if(file.isFile())
+				files.add(file);
+			else
+				for(File lib : file.listFiles())
+					if(lib.isDirectory())
+						files.addAll(getRecursiveChildren(lib));
+					else if(lib.getName().endsWith(".jar")) 
+						files.add(lib);
+		return files;
 	}
 }

@@ -8,32 +8,36 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.util.List;
 
 import mcupdater.AbstractJson;
 import mcupdater.remote.RemoteJson;
 
+import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
 
 public class LocalJson extends AbstractJson{
 
 	private String modpack;
 	private String version;
 	private String repo;
-	private String[] disabled;
+	private List<String> disabled = Lists.newArrayList();
 	
 	
 	public LocalJson(Reader json) throws NullPointerException{
 		super(json);
+		if(object.has("disabled")){
+			JsonArray array = object.get("disabled").getAsJsonArray();
+			for(JsonElement ele : array){
+				disabled.add(ele.getAsString());
+			}
+		}
 		modpack = object.get("modpack").getAsString();
 		version = object.get("version").getAsString();
 		repo = object.get("repo").getAsString();
 		
-		if(object.has("disabled")){
-			JsonArray array = object.get("disabled").getAsJsonArray();
-			disabled = new String[array.size()];
-			for(int i = 0; i < array.size(); i++)
-				disabled[i] = array.get(i).getAsString();
-		}
+		
 	}
 	
 	public LocalJson(File file) throws NullPointerException, FileNotFoundException{

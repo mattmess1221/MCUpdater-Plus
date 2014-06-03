@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
+import mcupdater.UpdaterMain;
+
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -21,6 +23,8 @@ public class LocalJson extends AbstractJson{
 	private String repo;
 	private List<String> disabled = Lists.newArrayList();
 	
+	private File localCache = new File(UpdaterMain.gameDir, "localcache.json");
+	private RemoteJson remote;
 	
 	public LocalJson(Reader json) throws NullPointerException{
 		super(json);
@@ -75,8 +79,20 @@ public class LocalJson extends AbstractJson{
 	}
 	
 	public RemoteJson getRemotePack() throws IOException{
-		InputStreamReader reader = new InputStreamReader(getRemoteJson().openStream());
-		return new RemoteJson(reader);
+		if(remote == null){
+			Reader reader;
+			try{
+				reader = new InputStreamReader(getRemoteJson().openStream());
+			} catch (IOException e){
+				if(localCache.exists() && localCache.isFile()){
+					UpdaterMain.logger.warn("Unable to connect to update server.  Using local backup cache.");
+					reader = new FileReader(localCache);
+				}
+				else throw new IOException(e);
+			}
+			this.remote = new RemoteJson(reader);
+		}
+		return this.remote;
 	}
 	
 }

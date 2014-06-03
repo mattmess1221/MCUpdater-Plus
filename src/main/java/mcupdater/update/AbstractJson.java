@@ -7,7 +7,7 @@ import com.google.gson.JsonObject;
 
 public abstract class AbstractJson implements IModPack{
 
-	private final Gson gson = new Gson();
+	protected final Gson gson = new Gson();
 	protected final JsonObject object;
 	private String mcversion;
 	

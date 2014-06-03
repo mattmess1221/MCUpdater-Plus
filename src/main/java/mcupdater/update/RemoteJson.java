@@ -1,5 +1,6 @@
 package mcupdater.update;
 
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
@@ -13,6 +14,8 @@ import mcupdater.update.mods.RemoteForgeMod;
 import mcupdater.update.mods.RemoteLiteMod;
 import mcupdater.update.mods.RemoteMod;
 
+import org.apache.commons.io.FileUtils;
+
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
@@ -25,6 +28,7 @@ public class RemoteJson extends AbstractJson {
 	public List<String> tweaks = Lists.newArrayList();
 	private String additionalArguments;
 	private Config config;
+	private File cache = new File(UpdaterMain.gameDir, "localcache.json");
 	
 	public RemoteJson(Reader json) throws IOException {
 		super(json);
@@ -36,6 +40,10 @@ public class RemoteJson extends AbstractJson {
 			this.addTweaks(object.get("tweakClasses").getAsJsonArray());
 		if(object.has("addiontalArguments"))
 			this.additionalArguments = object.get("additionalArguments").getAsString();
+		
+		// Saves cache
+		String string = gson.toJson(object);
+		FileUtils.writeStringToFile(this.cache, string);
 	}
 	
 	private void addTweaks(JsonArray array) {

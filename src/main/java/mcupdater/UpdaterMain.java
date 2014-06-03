@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 import mcupdater.download.Downloader;
+import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
 import mcupdater.update.RemoteJson;
 import mcupdater.update.libs.LocalLibrary;
@@ -67,7 +68,9 @@ public class UpdaterMain {
 	private void getInfo() {
 		try {
 			this.remote = this.local.getRemotePack();
-			remote.getConfig().updateConfigs();
+			Config config = remote.getConfig();
+			if(config != null)
+				config.updateConfigs();
 		} catch (MalformedURLException e) {
 			logger.error("Bad URL in modpack.json");
 			e.printStackTrace();

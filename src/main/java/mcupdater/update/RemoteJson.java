@@ -32,7 +32,8 @@ public class RemoteJson extends AbstractJson {
 	
 	public RemoteJson(Reader json) throws IOException {
 		super(json);
-		this.config = new Config(object.get("config"));
+		if(object.has("config"))
+			this.config = new Config(object.get("config"));
 		this.addMods(object.get("mods").getAsJsonArray());
 		if(object.has("libraries"))
 			this.addLibraries(object.get("libraries").getAsJsonArray());

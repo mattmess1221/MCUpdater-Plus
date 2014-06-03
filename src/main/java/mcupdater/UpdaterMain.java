@@ -6,13 +6,14 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
-import mcupdater.local.LocalForgeMod;
-import mcupdater.local.LocalJson;
-import mcupdater.local.LocalLibrary;
-import mcupdater.local.LocalLiteMod;
-import mcupdater.local.LocalMod;
-import mcupdater.remote.RemoteJson;
-import mcupdater.remote.RemoteMod;
+import mcupdater.download.Downloader;
+import mcupdater.update.LocalJson;
+import mcupdater.update.RemoteJson;
+import mcupdater.update.libs.LocalLibrary;
+import mcupdater.update.mods.LocalForgeMod;
+import mcupdater.update.mods.LocalLiteMod;
+import mcupdater.update.mods.LocalMod;
+import mcupdater.update.mods.RemoteMod;
 
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
@@ -24,8 +25,8 @@ import com.google.gson.JsonSyntaxException;
 public class UpdaterMain {
 
 	public static Logger logger = LogManager.getLogger("Updater");
-	public List<LocalMod> localMods = Lists.newArrayList();
-	public List<LocalLibrary> localLibraries = Lists.newArrayList();
+	public UpdatableList<LocalMod> localMods = new UpdatableList<LocalMod>();
+	public UpdatableList<LocalLibrary> localLibraries = new UpdatableList<LocalLibrary>();
 	public static File gameDir;
 	private RemoteJson remote;
 	private LocalJson local;
@@ -76,7 +77,7 @@ public class UpdaterMain {
 			e.printStackTrace();
 			throw (new RuntimeException());
 		} catch (JsonSyntaxException e) {
-			logger.error(String.format("Bad JSON in %spack.json\n%s", local.getRemotePackURL(), new Gson().toJson(remote.object)));
+			logger.error(String.format("Bad JSON in %spack.json\n%s", local.getRemotePackURL(), new Gson().toJson(remote.getJsonObject())));
 			e.printStackTrace();
 			throw (new RuntimeException());
 		}
@@ -90,7 +91,7 @@ public class UpdaterMain {
 			}
 			if (!compareContainer(remote))
 				try {
-					remote.downloadMod(null);
+					Downloader.downloadMod(remote);
 				} catch (MalformedURLException e) {
 					e.printStackTrace();
 				}
@@ -104,7 +105,7 @@ public class UpdaterMain {
 					logger.info("Updating " + local.getName() + " "
 							+ local.getVersion() + " to " + remote.getVersion());
 					try {
-						remote.downloadMod(local);
+						Downloader.downloadMod(remote, local);
 					} catch (MalformedURLException e) {
 						e.printStackTrace();
 					}
@@ -154,7 +155,6 @@ public class UpdaterMain {
 		} else if(file.getName().endsWith(".jar"))
 			localMods.add(new LocalForgeMod(file));
 	}
-
 
 	public static UpdaterMain getInstance() {
 		if(instance == null)

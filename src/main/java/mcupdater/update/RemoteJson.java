@@ -1,4 +1,4 @@
-package mcupdater.remote;
+package mcupdater.update;
 
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -6,9 +6,12 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
-import mcupdater.AbstractJson;
-import mcupdater.Config;
+import mcupdater.UpdatableList;
 import mcupdater.UpdaterMain;
+import mcupdater.update.libs.RemoteLibrary;
+import mcupdater.update.mods.RemoteForgeMod;
+import mcupdater.update.mods.RemoteLiteMod;
+import mcupdater.update.mods.RemoteMod;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -17,8 +20,8 @@ import com.google.gson.JsonObject;
 
 public class RemoteJson extends AbstractJson {
 
-	private List<RemoteMod> mods = Lists.newArrayList();
-	private List<RemoteLibrary> libraries = Lists.newArrayList();
+	private UpdatableList<RemoteMod> mods = new UpdatableList<RemoteMod>();
+	private UpdatableList<RemoteLibrary> libraries = new UpdatableList<RemoteLibrary>();
 	public List<String> tweaks = Lists.newArrayList();
 	private String additionalArguments;
 	private Config config;
@@ -67,11 +70,11 @@ public class RemoteJson extends AbstractJson {
 		return config;
 	}
 	
-	public List<RemoteMod> getModsList(){
+	public UpdatableList<RemoteMod> getModsList(){
 		return mods;
 	}
 
-	public List<RemoteLibrary> getLibrariesList(){
+	public UpdatableList<RemoteLibrary> getLibrariesList(){
 		return this.libraries;
 	}
 	

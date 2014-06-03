@@ -1,4 +1,4 @@
-package mcupdater.remote;
+package mcupdater.update.mods;
 
 import com.google.gson.JsonObject;
 

@@ -1,16 +1,17 @@
-package mcupdater.local;
+package mcupdater.update.libs;
 
 import java.io.File;
-import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
-import mcupdater.ILibrary;
 import mcupdater.LibraryClassLoader;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 import com.google.common.collect.Lists;
-
-public class LocalLibrary implements ILibrary {
+/**
+ * For other great adventures, check out your local library.
+ */
+public class LocalLibrary extends AbstractLibrary {
 
 	private String group;
 	private String name;
@@ -61,19 +62,7 @@ public class LocalLibrary implements ILibrary {
 		return file;
 	}
 	
-	public void loadLibrary(LaunchClassLoader classLoader) throws IOException{
+	public void loadLibrary(LaunchClassLoader classLoader) throws MalformedURLException{
 		LibraryClassLoader.getInstance().addLib(getFile());
-		
-	}
-	
-	public boolean equals(ILibrary library){
-		if(library == null)
-			return false;
-		if(library.getName().equals(this.getName())
-				&& library.getGroup().equals(this.getGroup())
-				&& library.getVersion().equals(this.getVersion())){
-			return true;
-		}
-		return false;
 	}
 }

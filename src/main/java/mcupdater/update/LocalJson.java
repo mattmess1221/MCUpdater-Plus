@@ -1,4 +1,4 @@
-package mcupdater.local;
+package mcupdater.update;
 
 import java.io.File;
 import java.io.FileNotFoundException;
@@ -9,9 +9,6 @@ import java.io.Reader;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
-
-import mcupdater.AbstractJson;
-import mcupdater.remote.RemoteJson;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -65,7 +62,7 @@ public class LocalJson extends AbstractJson{
 		}
 	}
 	
-	public boolean isDisabled(String modid){
+	public boolean isModDisabled(String modid){
 		for(String mod : disabled)
 			if(mod.equals(modid))
 				return true;

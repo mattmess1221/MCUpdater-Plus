@@ -22,12 +22,13 @@ public class LibraryClassLoader {
 	public void addLib(File modFile) throws MalformedURLException {
 		URL url = modFile.toURI().normalize().toURL();
 		try{
+			UpdaterMain.logger.info(String.format("Loading library %s.", modFile.getPath()));
 			URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
 			Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class[]{URL.class}); 
 			addURL.setAccessible(true);
 			addURL.invoke(classLoader, url);
 		}catch(Exception e){
-			
+			UpdaterMain.logger.error(String.format("Failed to load %s into classpath.", modFile.getPath()), e);
 		} finally {
 			classLoader.addURL(url);
 		}

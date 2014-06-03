@@ -1,4 +1,4 @@
-package mcupdater;
+package mcupdater.update;
 
 public interface IModPack {
 

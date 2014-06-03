@@ -1,4 +1,4 @@
-package mcupdater.local;
+package mcupdater.update.mods;
 
 import java.io.File;
 import java.io.IOException;

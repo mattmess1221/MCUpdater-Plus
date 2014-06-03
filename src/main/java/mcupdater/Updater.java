@@ -2,10 +2,12 @@ package mcupdater;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 
-import mcupdater.local.LocalLibrary;
-import mcupdater.remote.RemoteLibrary;
+import mcupdater.download.Downloader;
+import mcupdater.update.libs.LocalLibrary;
+import mcupdater.update.libs.RemoteLibrary;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
@@ -28,22 +30,18 @@ public class Updater implements ITweaker {
 		for(RemoteLibrary remote : mcup.getRemoteJson().getLibrariesList()){
 			if(!remote.installed())
 				try {
-					remote.download();
+					Downloader.downloadLibrary(remote);
 				} catch (IOException e) {
 					UpdaterMain.logger.error(String.format("Failed to download %s.", remote.getName()));
 					e.printStackTrace();
 				}
 			
-			for(LocalLibrary local : mcup.localLibraries){
-				if(remote.equals(local)){
-					try {
-						local.loadLibrary(classLoader);
-						UpdaterMain.logger.info(String.format("Loading library %s.", local.getFile().getPath()));
-					} catch (IOException e) {
-						e.printStackTrace();
-					}
-					break;
-				}
+			LocalLibrary local = mcup.localLibraries.get(remote);
+			//if(local != null)
+			try {
+				local.loadLibrary(classLoader);
+			} catch (MalformedURLException e) {
+				UpdaterMain.logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
 			}
 		}
 		

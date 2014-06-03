@@ -1,19 +1,15 @@
-package mcupdater.local;
+package mcupdater.update.mods;
 
 import java.io.File;
 
-import mcupdater.IMod;
+import mcupdater.update.IUpdatable;
 
-import com.google.gson.Gson;
-
-public abstract class LocalMod implements IMod {
+public abstract class LocalMod extends AbstractMod {
 
 	protected String name;
-	protected String modid;
 	protected String version;
 	protected File file;
 	
-	protected Gson gson = new Gson();
 
 	public String getName() {
 		return name;
@@ -29,5 +25,12 @@ public abstract class LocalMod implements IMod {
 
 	public String getFile() {
 		return file.getPath();
+	}
+	
+	@Override
+	public boolean equals(IUpdatable mod){
+		// TODO
+		return false;
+		
 	}
 }

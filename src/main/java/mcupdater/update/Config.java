@@ -1,4 +1,4 @@
-package mcupdater;
+package mcupdater.update;
 
 import java.io.BufferedReader;
 import java.io.File;
@@ -10,6 +10,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
+
+import mcupdater.UpdaterMain;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;

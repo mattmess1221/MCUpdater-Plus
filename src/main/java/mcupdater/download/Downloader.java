@@ -68,13 +68,13 @@ public class Downloader {
 	}
 	
 	public static void downloadLibrary(RemoteLibrary library) throws MalformedURLException, IOException{
-		String relative = library.getRelativePath();
 		String url = DEFAULT_LIBRARY_URL;
 		if(library.getURL() != null)
 			url = library.getURL();
-		File file = new File(LIBRARIES_DIR, relative);
+		File file = new File(LIBRARIES_DIR, library.getRelativePath());
+		URL u = new URL(url + library.getReativePathForDownload());
 		UpdaterMain.logger.info(String.format("Downloading %s.", file.getPath()));
-		downloadFile(new URL(url + relative), file);
+		downloadFile(u, file);
 		
 	}
 	

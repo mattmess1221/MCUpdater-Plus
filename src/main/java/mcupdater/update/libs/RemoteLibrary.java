@@ -14,6 +14,7 @@ public class RemoteLibrary extends AbstractLibrary{
 	private String name;
 	private String version;
 	private String url;
+	private String classifier;
 	
 	public RemoteLibrary(JsonObject obj){
 		this.name = obj.get("name").getAsString();
@@ -21,6 +22,9 @@ public class RemoteLibrary extends AbstractLibrary{
 		this.group = obj.get("group").getAsString();
 		if(obj.has("url"))
 			this.url = obj.get("url").getAsString();
+		if(obj.has("classifier"))
+			this.url = obj.get("classifier").getAsString();
+			
 	}
 	
 	@Override
@@ -44,12 +48,28 @@ public class RemoteLibrary extends AbstractLibrary{
 		return url + (url.endsWith("/") ? "" : "/" );
 	}
 	
+	public String getClassifier(){
+		return classifier;
+	}
+	
 	public boolean installed(){
 		return getLocalFile().exists();
 	}
-
+	
+	public boolean hasClassifier(){
+		return classifier != null;
+	}
+	
+	public String getReativePathForDownload(){
+		return getParentPath() + (hasClassifier() ? "-" + classifier : "") + ".jar";
+	}
+	
 	public String getRelativePath(){
-		return group.replace('.', '/') + "/" + name + "/" + version + "/" + name + "-" + version + ".jar";
+		return getParentPath() + ".jar";
+	}
+	
+	private String getParentPath(){
+		return group.replace('.', '/') + "/" + name + "/" + version + "/" + name + "-" + version;
 	}
 	
 	private File getLocalFile(){

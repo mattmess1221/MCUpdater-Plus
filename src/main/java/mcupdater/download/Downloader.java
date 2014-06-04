@@ -10,6 +10,7 @@ import java.net.URLConnection;
 
 import mcupdater.Platform;
 import mcupdater.UpdaterMain;
+import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
@@ -75,6 +76,7 @@ public class Downloader {
 		URL u = new URL(url + library.getRelativePathForDownload());
 		UpdaterMain.logger.info(String.format("Downloading %s.", file.getPath()));
 		downloadFile(u, file);
+		UpdaterMain.getInstance().localLibraries.add(new LocalLibrary(file));
 		
 	}
 	

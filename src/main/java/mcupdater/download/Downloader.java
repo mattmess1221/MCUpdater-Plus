@@ -72,7 +72,7 @@ public class Downloader {
 		if(library.getURL() != null)
 			url = library.getURL();
 		File file = new File(LIBRARIES_DIR, library.getRelativePath());
-		URL u = new URL(url + library.getReativePathForDownload());
+		URL u = new URL(url + library.getRelativePathForDownload());
 		UpdaterMain.logger.info(String.format("Downloading %s.", file.getPath()));
 		downloadFile(u, file);
 		

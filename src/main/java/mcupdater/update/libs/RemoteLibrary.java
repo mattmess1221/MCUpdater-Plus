@@ -23,7 +23,7 @@ public class RemoteLibrary extends AbstractLibrary{
 		if(obj.has("url"))
 			this.url = obj.get("url").getAsString();
 		if(obj.has("classifier"))
-			this.url = obj.get("classifier").getAsString();
+			this.classifier = obj.get("classifier").getAsString();
 			
 	}
 	
@@ -60,7 +60,7 @@ public class RemoteLibrary extends AbstractLibrary{
 		return classifier != null;
 	}
 	
-	public String getReativePathForDownload(){
+	public String getRelativePathForDownload(){
 		return getParentPath() + (hasClassifier() ? "-" + classifier : "") + ".jar";
 	}
 	
@@ -77,6 +77,6 @@ public class RemoteLibrary extends AbstractLibrary{
 	}
 	
 	public URL getRemoteURL() throws MalformedURLException{
-		return new URL(getURL() + getRelativePath());
+		return new URL(getURL() + getRelativePathForDownload());
 	}
 }

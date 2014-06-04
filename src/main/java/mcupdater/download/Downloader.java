@@ -73,9 +73,18 @@ public class Downloader {
 		if(library.getURL() != null)
 			url = library.getURL();
 		File file = new File(LIBRARIES_DIR, library.getRelativePath());
-		URL u = new URL(url + library.getRelativePathForDownload());
+		File md5f = new File(LIBRARIES_DIR, library.getRelativePath() + ".md5");
+		URL md5 = new URL(url + library.getRelativePathForDownload() + ".md5");
+		URL u = new URL(url + library.getRelativePathForDownload());	
+		// TODO different hashing types
 		UpdaterMain.logger.info(String.format("Downloading %s.", file.getPath()));
-		downloadFile(u, file);
+		try{
+			downloadFile(md5, md5f);
+			downloadFileWithHashCheck(u, file, FileUtils.readFileToString(md5f));
+		}catch(FileNotFoundException e){
+			downloadFile(u, file);
+		}
+			
 		UpdaterMain.getInstance().localLibraries.add(new LocalLibrary(file));
 		
 	}
@@ -111,12 +120,17 @@ public class Downloader {
 	}
 	
 	private static boolean downloadFileWithHashCheck(URL source, File destination, String md5sum) throws IOException{
+		return downloadFileWithHashCheck(source, destination, md5sum, Hashing.md5());
+	}
+	
+	private static boolean downloadFileWithHashCheck(URL source, File destination, String hash, HashFunction hashType) throws IOException {
 		downloadFile(source, destination);
-		return checkHash(destination, md5sum, Hashing.md5());
+		return checkHash(destination, hash, hashType);
 	}
 	
 	private static boolean checkHash(File file, String hash, HashFunction hashType) throws IOException {
 		HashCode hashCode = Files.hash(file, hashType);
 		return hashCode.toString().equals(hash);
 	}
+	
 }

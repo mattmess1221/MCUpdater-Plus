@@ -13,9 +13,6 @@ import com.google.common.collect.Lists;
  */
 public class LocalLibrary extends AbstractLibrary {
 
-	private String group;
-	private String name;
-	private String version;
 	private File file;
 	
 	public LocalLibrary(File lib){
@@ -42,22 +39,6 @@ public class LocalLibrary extends AbstractLibrary {
 		this.version = version.getName();
 		
 	}
-	
-	@Override
-	public String getGroup() {
-		return group;
-	}
-
-	@Override
-	public String getName() {
-		return name;
-	}
-
-	@Override
-	public String getVersion() {
-		return version;
-	}
-
 	public File getFile(){
 		return file;
 	}

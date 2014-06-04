@@ -10,5 +10,7 @@ public interface ILibrary extends IUpdatable {
 	public String getName();
 	
 	public String getVersion();
+
+    public String getClassifier();
 	
 }

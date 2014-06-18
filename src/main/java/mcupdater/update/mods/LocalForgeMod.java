@@ -9,6 +9,8 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
 import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonIOException;
 import com.google.gson.JsonObject;
 
 public class LocalForgeMod extends LocalMod{
@@ -29,15 +31,33 @@ public class LocalForgeMod extends LocalMod{
 			zip.close();
 			throw new IOException("mcmod.info not found!");
 		}
-		JsonArray array = gson.fromJson(new InputStreamReader(mcmod), JsonArray.class);
-		JsonObject object = array.get(0).getAsJsonObject();
-
-		this.name = object.get("name").getAsString();
-		this.modid = object.get("modid").getAsString();
-		this.version = object.get("version").getAsString();
-		
-		mcmod.close();
-		zip.close();
+		JsonElement element = gson.fromJson(new InputStreamReader(mcmod), JsonElement.class);
+		try{
+			JsonArray array;
+			if(element.isJsonArray())
+				array = element.getAsJsonArray();
+			else if(element.isJsonObject()){
+				JsonObject modListVersion = element.getAsJsonObject().get("modListVersion").getAsJsonObject();
+				switch(modListVersion.getAsInt()){
+				default:
+				case 2:
+					array = element.getAsJsonObject().get("modList").getAsJsonArray();		
+					break;
+				}
+			}else
+				throw new JsonIOException("Invalid mcmod.info");
+			JsonObject object = array.get(0).getAsJsonObject();
+			try{
+				this.name = object.get("name").getAsString();
+				this.modid = object.get("modid").getAsString();
+				this.version = object.get("version").getAsString();
+			} catch (NullPointerException e){
+				throw new JsonIOException("Missing required elements", e);
+			}
+		}finally{
+			mcmod.close();
+			zip.close();
+		}
 	}
 
 }

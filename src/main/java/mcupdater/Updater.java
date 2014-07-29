@@ -5,6 +5,7 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import mcupdater.Side.Sides;
 import mcupdater.download.Downloader;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
@@ -19,7 +20,7 @@ public class Updater implements ITweaker {
 	@Override
 	public void acceptOptions(List<String> args, File gameDir, File assetsDir,
 			String profile) {
-		
+		Side.setSide(Sides.CLIENT);
 		mcup = new UpdaterMain(gameDir);
 		mcup.main(args.toArray(new String[args.size()]));
 	}

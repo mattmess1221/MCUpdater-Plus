@@ -2,8 +2,6 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'application'
-apply plugin: 'launch4j'
 apply plugin: 'grgit-release'
 
 import org.ajoberstar.grgit.*
@@ -26,7 +24,6 @@ buildscript {
 		mavenCentral()
 	}
 	dependencies {
-		classpath group: 'edu.sc.seis.gradle', name: 'launch4j', version: '1.0.6'
         classpath group: 'org.ajoberstar', name: 'gradle-git', version: '0.8.0'
 	}
 }
@@ -38,12 +35,11 @@ jar {
 }
 
 dependencies {
-	compile group: 'com.google.code.gson', name: 'gson', version:'1.7.2'
-	compile group: 'log4j', name:'log4j', version:'1.2.7'
-	compile group: 'net.minecraft', name: 'launchwrapper', version:'1.9'
-	compile group: 'commons-io', name: 'commons-io', version: '2.4' 
-	compile group: 'com.google.guava', name: 'guava', version: '17.0'
-
+	compile 'com.google.code.gson:gson:1.7.2'
+	compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
+	compile 'net.minecraft:launchwrapper:1.9'
+	compile 'commons-io:commons-io:2.4'
+	compile 'com.google.guava:guava:17.0'
 }
 
 release {

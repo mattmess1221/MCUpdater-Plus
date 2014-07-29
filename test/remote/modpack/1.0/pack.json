@@ -32,6 +32,12 @@
 			"file": "http://applefreak.voxelmodpack.com/moduploads/voxelcam/mod_VoxelCam_1.3.0_mc1.7.2.litemod",
 			"type": "liteloader",
 			"md5": "f9bff3178201807a535a83af0be70466"
+		},
+		{
+			"modid": "journeymap",
+			"version": "4.0.2",
+			"file": "http://addons.cursecdn.com/files/2209/394/JourneyMap4.0.2_FairPlay_MC1.7.2.jar#JourneyMap4.0.2_FairPlay_MC1.7.2.jar",
+			"side": "client"
 		}
 	],
 	"tweakClasses":[

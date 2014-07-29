@@ -7,6 +7,8 @@ import java.io.Reader;
 import java.net.URL;
 import java.util.List;
 
+import mcupdater.Side;
+import mcupdater.Side.Sides;
 import mcupdater.UpdatableList;
 import mcupdater.UpdaterMain;
 import mcupdater.update.libs.RemoteLibrary;
@@ -39,7 +41,7 @@ public class RemoteJson extends AbstractJson {
 			this.addLibraries(object.get("libraries").getAsJsonArray());
 		if(object.has("tweakClasses"))
 			this.addTweaks(object.get("tweakClasses").getAsJsonArray());
-		if(object.has("addiontalArguments"))
+		if(object.has("additionalArguments"))
 			this.additionalArguments = object.get("additionalArguments").getAsString();
 		
 		// Saves cache
@@ -66,8 +68,12 @@ public class RemoteJson extends AbstractJson {
 			JsonObject obj = ele.getAsJsonObject();
 			if(obj.has("type") && obj.get("type").getAsString().equals("liteloader"))
 				mods.add(new RemoteLiteMod(obj));
-			else
-				mods.add(new RemoteForgeMod(obj));
+			else{
+				RemoteForgeMod mod = new RemoteForgeMod(obj);
+				if((Sides.SERVER.equals(Side.getSide()) && !Sides.CLIENT.equals(mod.getSide()))
+						|| (Sides.CLIENT.equals(Side.getSide()) && !Sides.SERVER.equals(mod.getSide())))
+					mods.add(mod);
+			}
 		}
 	}
 	

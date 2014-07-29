@@ -7,6 +7,8 @@ import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
+import mcupdater.Side.Sides;
+
 
 public class ServerMain {
 
@@ -15,6 +17,7 @@ public class ServerMain {
 
 
 	public static void main(final String[] args) throws Exception {
+		Side.setSide(Sides.SERVER);
 		if(new ServerMain().loadMCJar()){
 			new UpdaterMain().main(args);
 		}

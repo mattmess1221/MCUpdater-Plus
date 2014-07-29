@@ -1,5 +1,6 @@
 package mcupdater.update.mods;
 
+import mcupdater.Side.Sides;
 import mcupdater.UpdaterMain;
 
 import com.google.gson.JsonObject;
@@ -48,6 +49,10 @@ public abstract class RemoteMod extends AbstractMod{
 	
 	public boolean isEnabled(){
 		return enabled;
+	}
+	
+	public Sides getSide(){
+		return null;
 	}
 	
 }

@@ -18,7 +18,8 @@ public abstract class RemoteMod extends AbstractMod{
 		
 			this.modid = object.get("modid").getAsString();
 			this.url = object.get("file").getAsString();
-			this.md5 = object.get("md5").getAsString();
+			if(object.has("md5"))
+				this.md5 = object.get("md5").getAsString();
 			
 			enabled = !mcup.getLocalJson().isModDisabled(modid);
 	}

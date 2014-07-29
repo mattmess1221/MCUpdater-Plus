@@ -33,16 +33,13 @@ public class LocalForgeMod extends LocalMod{
 		}
 		JsonElement element = gson.fromJson(new InputStreamReader(mcmod), JsonElement.class);
 		try{
-			JsonArray array;
+			JsonArray array = null;
 			if(element.isJsonArray())
 				array = element.getAsJsonArray();
 			else if(element.isJsonObject()){
-				JsonObject modListVersion = element.getAsJsonObject().get("modListVersion").getAsJsonObject();
-				switch(modListVersion.getAsInt()){
-				default:
-				case 2:
-					array = element.getAsJsonObject().get("modList").getAsJsonArray();		
-					break;
+				JsonElement modListVersion = element.getAsJsonObject().get("modListVersion");
+				if(modListVersion.getAsInt() == 2){
+					array = element.getAsJsonObject().get("modList").getAsJsonArray();
 				}
 			}else
 				throw new JsonIOException("Invalid mcmod.info");

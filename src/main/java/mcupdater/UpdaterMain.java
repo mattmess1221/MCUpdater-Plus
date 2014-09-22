@@ -155,7 +155,7 @@ public class UpdaterMain {
 	private void addMod(File file) throws IOException {
 		if (file.getName().endsWith(".litemod")) {
 			localMods.add(new LocalLiteMod(file));
-		} else if(file.getName().endsWith(".jar"))
+		} else if(file.getName().endsWith(".jar") || file.getName().endsWith(".zip"))
 			localMods.add(new LocalForgeMod(file));
 	}
 

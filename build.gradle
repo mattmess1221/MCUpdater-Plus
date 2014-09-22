@@ -6,6 +6,9 @@ apply plugin: 'grgit-release'
 
 import org.ajoberstar.grgit.*
 
+targetCompatibility = 1.6
+sourceCompatibility = 1.6
+
 mainClassName = 'mcupdater.ServerMain'
 group = 'mcupdater'
 archivesBaseName = 'MCUpdaterPlus'

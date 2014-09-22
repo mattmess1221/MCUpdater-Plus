@@ -25,7 +25,8 @@ public class JavaLogger extends LogHelper {
 	protected void log(LogLevel level, Object object) {
 		String out = createPrefix(calendar, level, id) + object.toString();
 		System.out.println(out);
-		fileLogger.println(out);
+		if(fileLogger != null)
+			fileLogger.println(out);
 	}
 
 	@Override
@@ -34,7 +35,8 @@ public class JavaLogger extends LogHelper {
 			message = throwable.getLocalizedMessage();
 		log(level, message);
 		throwable.printStackTrace();
-		throwable.printStackTrace(this.fileLogger);
+		if(fileLogger != null)
+			throwable.printStackTrace(this.fileLogger);
 	}
 	
 	private String createPrefix(Calendar calendar, LogLevel level, String id){

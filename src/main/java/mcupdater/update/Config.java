@@ -12,12 +12,14 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
 import mcupdater.UpdaterMain;
+import mcupdater.logging.LogHelper;
 
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 
 public class Config {
 
+	private LogHelper logger = LogHelper.getLogger();
 	private File gameDir;
 	private URL remoteFile;
 	private String remoteVersion = "";
@@ -40,7 +42,7 @@ public class Config {
 		remoteFile = getRemoteFile(getJsonObject(jsonElement), mcup.getLocalJson().getRemotePackURL().toString());
 		shouldUpdate = !localVersion.equals(remoteVersion);
 		if (shouldUpdate) {
-			UpdaterMain.logger.info("Config updates avaliable");
+			logger.info("Config updates avaliable");
 		}
 	}
 
@@ -82,10 +84,10 @@ public class Config {
 
 	public void updateConfigs() throws IOException {
 		if (!shouldUpdate){
-			UpdaterMain.logger.info("Configs up to date.");
+			logger.info("Configs up to date.");
 			return;
 		}
-		UpdaterMain.logger.info("Downloading Configs.");
+		logger.info("Downloading Configs.");
 		ZipInputStream zip = new ZipInputStream(remoteFile.openStream());
 		
 		ZipEntry entry = zip.getNextEntry();
@@ -94,7 +96,7 @@ public class Config {
 			try {
 				currentEntry = entry.getName();
 				if(!currentEntry.endsWith("/"))
-				UpdaterMain.logger.info("Extracting " + currentEntry);
+				logger.info("Extracting " + currentEntry);
 				File destFile = new File(gameDir.getPath() + "/" + entry.getName());
 				if (entry.isDirectory()) {
 					destFile.mkdirs();
@@ -111,7 +113,7 @@ public class Config {
 					writer.close();
 				}
 			} catch (IOException e) {
-				UpdaterMain.logger.error("Couldn't save " + currentEntry);
+				logger.error("Couldn't save " + currentEntry);
 			}
 			entry = zip.getNextEntry();
 		}

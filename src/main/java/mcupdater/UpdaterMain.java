@@ -7,6 +7,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 
 import mcupdater.download.Downloader;
+import mcupdater.logging.LogHelper;
 import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
 import mcupdater.update.RemoteJson;
@@ -16,16 +17,13 @@ import mcupdater.update.mods.LocalLiteMod;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 public class UpdaterMain {
 
-	public static Logger logger = LogManager.getLogger("Updater");
+	private static final LogHelper logger = LogHelper.getLogger();
 	public UpdatableList<LocalMod> localMods = new UpdatableList<LocalMod>();
 	public UpdatableList<LocalLibrary> localLibraries = new UpdatableList<LocalLibrary>();
 	public static File gameDir;

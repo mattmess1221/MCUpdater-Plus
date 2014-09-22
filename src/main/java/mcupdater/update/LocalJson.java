@@ -11,6 +11,7 @@ import java.net.URL;
 import java.util.List;
 
 import mcupdater.UpdaterMain;
+import mcupdater.logging.LogHelper;
 
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
@@ -85,7 +86,7 @@ public class LocalJson extends AbstractJson{
 				reader = new InputStreamReader(getRemoteJson().openStream());
 			} catch (IOException e){
 				if(localCache.exists() && localCache.isFile()){
-					UpdaterMain.logger.warn("Unable to connect to update server.  Using local backup cache.");
+					LogHelper.getLogger().warn("Unable to connect to update server.  Using local backup cache.");
 					reader = new FileReader(localCache);
 				}
 				else throw new IOException(e);

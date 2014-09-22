@@ -11,6 +11,7 @@ import mcupdater.Side;
 import mcupdater.Side.Sides;
 import mcupdater.UpdatableList;
 import mcupdater.UpdaterMain;
+import mcupdater.logging.LogHelper;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.RemoteForgeMod;
 import mcupdater.update.mods.RemoteLiteMod;
@@ -62,7 +63,7 @@ public class RemoteJson extends AbstractJson {
 	private void addMods(JsonArray array){
 		for(JsonElement ele : array){
 			if(!ele.isJsonObject()){
-				UpdaterMain.logger.warn("Encountered a non-object: " + ele.getAsString() + ". Skipping.");
+				LogHelper.getLogger().warn("Encountered a non-object: " + ele.getAsString() + ". Skipping.");
 				break;
 			}
 			JsonObject obj = ele.getAsJsonObject();

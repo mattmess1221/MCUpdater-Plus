@@ -7,6 +7,7 @@ import java.util.List;
 
 import mcupdater.Side.Sides;
 import mcupdater.download.Downloader;
+import mcupdater.logging.LogHelper;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
 import net.minecraft.launchwrapper.ITweaker;
@@ -15,6 +16,7 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class Updater implements ITweaker {
 
+	private static final LogHelper logger = LogHelper.getLogger();
 	private UpdaterMain mcup;
 	
 	@Override
@@ -33,7 +35,7 @@ public class Updater implements ITweaker {
 				try {
 					Downloader.downloadLibrary(remote);
 				} catch (IOException e) {
-					UpdaterMain.logger.error(String.format("Failed to download %s.", remote.getName()));
+					logger.error(String.format("Failed to download %s.", remote.getName()));
 					e.printStackTrace();
 				}
 			
@@ -42,7 +44,7 @@ public class Updater implements ITweaker {
 			try {
 				local.loadLibrary(classLoader);
 			} catch (MalformedURLException e) {
-				UpdaterMain.logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
+				logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
 			}
 		}
 		

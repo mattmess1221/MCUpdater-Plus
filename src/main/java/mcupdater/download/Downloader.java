@@ -10,6 +10,7 @@ import java.net.URLConnection;
 
 import mcupdater.Platform;
 import mcupdater.UpdaterMain;
+import mcupdater.logging.LogHelper;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.LocalMod;
@@ -24,6 +25,7 @@ import com.google.common.io.Files;
 
 public class Downloader {
 
+	private static final LogHelper logger = LogHelper.getLogger();
 	private final static File MC_DIR = Platform.getMinecraftHome();
 	private final static File GAME_DIR = UpdaterMain.gameDir;
 	private final static File MODS_DIR = new File(GAME_DIR, "mods");
@@ -61,9 +63,9 @@ public class Downloader {
 				downloadFileWithHashCheck(url, newFile, remote.getMD5(), 3);
 			}
 		} catch (FileNotFoundException e) {
-			UpdaterMain.logger.warn(remote.getFile() + " not found!", e);
+			logger.warn(remote.getFile() + " not found!", e);
 		} catch (IOException e) {
-			UpdaterMain.logger.warn("Unable to read " + remote.getFile(), e);
+			logger.warn("Unable to read " + remote.getFile(), e);
 		}
 		
 	}
@@ -77,7 +79,7 @@ public class Downloader {
 		URL md5 = new URL(url + library.getRelativePathForDownload() + ".md5");
 		URL u = new URL(url + library.getRelativePathForDownload());	
 		// TODO different hashing types
-		UpdaterMain.logger.info(String.format("Downloading %s.", file.getPath()));
+		logger.info(String.format("Downloading %s.", file.getPath()));
 		try{
 			downloadFile(md5, md5f);
 			downloadFileWithHashCheck(u, file, FileUtils.readFileToString(md5f));
@@ -94,16 +96,16 @@ public class Downloader {
 		int i = 0;
 		while(!flag && i  < tries){
 			try {
-				UpdaterMain.logger.info(String.format("Downloading %s (try %s).", destination.getName(), i));
+				logger.info(String.format("Downloading %s (try %s).", destination.getName(), i));
 				flag = downloadFileWithHashCheck(source, destination, hash);
 			} catch (IOException e) {
 				e.printStackTrace();
 			}finally{
 				if(!flag){
-					UpdaterMain.logger.info(String.format("%s MD5 Failed after %s tries!", destination.getName(), tries));
+					logger.info(String.format("%s MD5 Failed after %s tries!", destination.getName(), tries));
 					destination.delete();
 				} else {
-					UpdaterMain.logger.info(destination.getName() + " MD5 Verified");
+					logger.info(destination.getName() + " MD5 Verified");
 				}
 				i++;
 			}

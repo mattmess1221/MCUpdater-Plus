@@ -147,8 +147,8 @@ public class UpdaterMain {
 						}
 					}
 				}
-			} catch (IOException e) {
-				logger.error("Unable to read mod file " + file.getName());
+			} catch (Exception e) {
+				logger.error("Unable to read mod file " + file.getName() + " (" + e.getMessage()+")");
 			}
 	}
 

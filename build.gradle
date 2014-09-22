@@ -9,7 +9,7 @@ import org.ajoberstar.grgit.*
 targetCompatibility = 1.6
 sourceCompatibility = 1.6
 
-mainClassName = 'mcupdater.ServerMain'
+ext.mainClassName = 'mcupdater.ServerMain'
 group = 'mcupdater'
 archivesBaseName = 'MCUpdaterPlus'
 
@@ -19,7 +19,6 @@ repositories {
 		name = 'minecraft'
 		url = 'https://libraries.minecraft.net/'
 	}
-
 }
 
 buildscript {
@@ -38,11 +37,17 @@ jar {
 }
 
 dependencies {
-	compile 'com.google.code.gson:gson:1.7.2'
-	compile 'org.apache.logging.log4j:log4j-api:2.0-beta9'
-	compile 'net.minecraft:launchwrapper:1.9'
+	compile 'com.google.code.gson:gson:2.2.4'
+	compile 'org.apache.logging.log4j:log4j-api:2.0.2'
+	runtime 'org.apache.logging.log4j:log4j-core:2.0.2'
+	compile ('net.minecraft:launchwrapper:1.11'){
+		exclude group: 'org.lwjgl.lwjgl', module: 'lwjgl'
+		exclude group: 'org.apache.logging.log4j'
+		exclude group: 'org.ow2.asm', module:'asm-debug-all'
+		exclude group: 'net.sf.jopt-simple', module: 'jopt-simple'
+	}
 	compile 'commons-io:commons-io:2.4'
-	compile 'com.google.guava:guava:17.0'
+	compile 'com.google.guava:guava:15.0'
 }
 
 release {

@@ -1,9 +1,17 @@
-/bin
-/.gradle/
+# Gradle
+.gradle/
+
+# IntelliJ
 *.iml
 *.ipr
 *.iws
+
+# Eclipse
 .project
 .classpath
-/out/
-/build/
+.settings/
+
+# Building
+bin/
+out/
+build/

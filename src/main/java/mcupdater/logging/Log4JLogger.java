@@ -1,8 +1,13 @@
 package mcupdater.logging;
 
+import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
-import org.apache.logging.log4j.simple.SimpleLogger;
+
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Arrays;
+import java.util.List;
 
 public class Log4JLogger extends LogHelper {
 
@@ -10,8 +15,6 @@ public class Log4JLogger extends LogHelper {
 
 	Log4JLogger() {
 		logger = LogManager.getLogger("MCUpdater Plus");
-		if(logger instanceof SimpleLogger)
-			throw new RuntimeException();
 	}
 	
 	@Override
@@ -24,4 +27,26 @@ public class Log4JLogger extends LogHelper {
 		logger.log(level.getLog4jLevel(), message, t);
 	}
 
+    public void setLevel(Level level) {
+        Class loggerclass = logger.getClass();
+        List<Method> methodsList = Arrays.asList(loggerclass.getDeclaredMethods());
+        Method setLevelMethod = null;
+        for(Method method : methodsList){
+            if(method.getName().equals("setLevel") && Arrays.equals(method.getParameterTypes(), new Class[] {Level.class})){
+                setLevelMethod = method;
+                break;
+            }
+        }
+        if(setLevelMethod == null){
+            logger.error("The current logger does not support setting the level!");
+        }else {
+            try {
+                setLevelMethod.invoke(logger, level);
+            } catch (IllegalAccessException e) {
+                e.printStackTrace();
+            } catch (InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+    }
 }

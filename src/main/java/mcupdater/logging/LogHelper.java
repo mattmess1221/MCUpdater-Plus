@@ -106,4 +106,12 @@ public abstract class LogHelper {
 			return Level.valueOf(name());
 		}
 	}
+
+    public void setLog4jLevel(Level level){
+        if(instance instanceof Log4JLogger){
+            ((Log4JLogger) instance).setLevel(level);
+        }else{
+             instance.log(LogLevel.ERROR, "Could not set the log-level, the current logger does not support it!");
+        }
+    }
 }

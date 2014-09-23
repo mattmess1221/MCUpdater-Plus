@@ -4,9 +4,11 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Arrays;
 import java.util.List;
 
 import mcupdater.download.Downloader;
+import mcupdater.logging.Log4JLogger;
 import mcupdater.logging.LogHelper;
 import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
@@ -20,6 +22,8 @@ import mcupdater.update.mods.RemoteMod;
 import com.google.common.collect.Lists;
 import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
+import org.apache.logging.log4j.Level;
+import sun.rmi.runtime.Log;
 
 public class UpdaterMain {
 
@@ -30,6 +34,8 @@ public class UpdaterMain {
 	private RemoteJson remote;
 	private LocalJson local;
 	private static UpdaterMain instance;
+    private static Boolean verbose = false;
+
 
 	public UpdaterMain() {
 		gameDir = new File(System.getProperty("user.dir"));
@@ -42,6 +48,8 @@ public class UpdaterMain {
 	}
 
 	public void main(String[] args) {
+        verbose = Arrays.asList(args).contains("--mcu-verbose");
+        logger.setLog4jLevel(verbose ? Level.DEBUG : Level.INFO);
 		logger.info("Starting Updater");
 		File modpack = new File(gameDir, "modpack.json");
 		if (modpack.exists()) {

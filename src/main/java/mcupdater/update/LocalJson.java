@@ -6,11 +6,13 @@ import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.Reader;
+import java.net.Authenticator;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.List;
 
 import mcupdater.UpdaterMain;
+import mcupdater.download.DLAuthenticator;
 import mcupdater.logging.LogHelper;
 
 import com.google.common.collect.Lists;
@@ -39,7 +41,12 @@ public class LocalJson extends AbstractJson{
 		version = object.get("version").getAsString();
 		repo = object.get("repo").getAsString();
 		
-		
+		if(object.has("username") && object.has("password")){
+			// register the username and password
+			String username = object.get("username").getAsString();
+			String password = object.get("password").getAsString();
+			Authenticator.setDefault(new DLAuthenticator(username, password));
+		}
 	}
 	
 	public LocalJson(File file) throws NullPointerException, FileNotFoundException{

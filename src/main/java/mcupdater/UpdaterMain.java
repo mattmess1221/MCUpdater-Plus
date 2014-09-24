@@ -6,8 +6,12 @@ import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 
+import joptsimple.ArgumentAcceptingOptionSpec;
+import joptsimple.OptionParser;
+import joptsimple.OptionSet;
 import mcupdater.download.Downloader;
 import mcupdater.logging.LogHelper;
+import mcupdater.logging.LogHelper.LogLevel;
 import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
 import mcupdater.update.RemoteJson;
@@ -43,12 +47,13 @@ public class UpdaterMain {
 
 	public void main(String[] args) {
 		logger.info("Starting Updater");
+		parseArguments(args);
 		File modpack = new File(gameDir, "modpack.json");
 		if (modpack.exists()) {
 			try {
 				readJson(modpack);
 			} catch (MalformedURLException e) {
-				e.printStackTrace();
+				logger.warn("Modpack URL is invalid.", e);
 			}
 			readMods(new File(gameDir, "mods"));
 			getInfo();
@@ -63,6 +68,23 @@ public class UpdaterMain {
 
 	}
 
+	private void parseArguments(String[] args) {
+
+		OptionParser parser = new OptionParser();
+		parser.allowsUnrecognizedOptions();
+		// log level
+		ArgumentAcceptingOptionSpec<String> argLogLevel = parser.accepts("updaterLogLevel", "The log level to use.").withRequiredArg().defaultsTo("INFO");
+		OptionSet optionSet = parser.parse(args);
+
+		// Set the log level
+		String level = argLogLevel.value(optionSet);
+		logger.setLevel(LogLevel.getLevel(level));
+		if(logger.getLevel() == null){
+			throw new IllegalArgumentException("The specified log level doesn't exist.");
+		}
+		logger.debug("Log Level set to " + logger.getLevel().name());
+	}
+
 	private void getInfo() {
 		try {
 			this.remote = this.local.getRemotePack();
@@ -70,16 +92,13 @@ public class UpdaterMain {
 			if(config != null)
 				config.updateConfigs();
 		} catch (MalformedURLException e) {
-			logger.error("Bad URL in modpack.json");
-			e.printStackTrace();
+			logger.error("Bad URL in modpack.json", e);
 			throw (new RuntimeException());
 		} catch (IOException e) {
-			logger.error(String.format("Could not open modpack definition %s", local.getRemotePackURL()));
-			e.printStackTrace();
+			logger.error(String.format("Could not open modpack definition %s", local.getRemotePackURL()), e);
 			throw (new RuntimeException());
 		} catch (JsonSyntaxException e) {
 			logger.error(String.format("Bad JSON in %spack.json\n%s", local.getRemotePackURL(), new Gson().toJson(remote.getJsonObject())));
-			e.printStackTrace();
 			throw (new RuntimeException());
 		}
 	}
@@ -94,7 +113,7 @@ public class UpdaterMain {
 				try {
 					Downloader.downloadMod(remote);
 				} catch (MalformedURLException e) {
-					e.printStackTrace();
+					logger.warn(remote.getName() + "'s download is invalid.", e);
 				}
 		}
 	}
@@ -108,7 +127,7 @@ public class UpdaterMain {
 					try {
 						Downloader.downloadMod(remote, local);
 					} catch (MalformedURLException e) {
-						e.printStackTrace();
+						logger.warn(remote.getName() + "'s download is invalid.", e);
 					}
 				} else {
 					String version;
@@ -128,7 +147,7 @@ public class UpdaterMain {
 		try {
 			this.local = new LocalJson(json);
 		} catch (FileNotFoundException e) {
-			e.printStackTrace();
+			logger.error("Local modpack.json not found.", e);
 		}
 	}
 

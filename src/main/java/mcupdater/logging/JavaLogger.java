@@ -24,7 +24,8 @@ public class JavaLogger extends LogHelper {
 	@Override
 	protected void log(LogLevel level, Object object) {
 		String out = createPrefix(calendar, level, id) + object.toString();
-		System.out.println(out);
+		if(shouldWrite(this.getLevel()))
+			System.out.println(out);
 		if(fileLogger != null)
 			fileLogger.println(out);
 	}
@@ -34,12 +35,17 @@ public class JavaLogger extends LogHelper {
 		if(message == null || message.isEmpty())
 			message = throwable.getLocalizedMessage();
 		log(level, message);
-		throwable.printStackTrace();
+		if(shouldWrite(this.getLevel()))
+			throwable.printStackTrace();
 		if(fileLogger != null)
 			throwable.printStackTrace(this.fileLogger);
 	}
 	
 	private String createPrefix(Calendar calendar, LogLevel level, String id){
 		return String.format("%s [%s] [%s] ", date.format(calendar.getTime()), level.name(), id);
+	}
+
+	private boolean shouldWrite(LogLevel currentLevel){
+		return currentLevel.getIntValue() <= this.getLevel().getIntValue();
 	}
 }

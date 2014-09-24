@@ -69,7 +69,7 @@ public class LocalJson extends AbstractJson{
 		try {
 			return new URL(repo + (repo.endsWith("/") ? "" : "/" ) + modpack + "/" + version + "/");
 		} catch (MalformedURLException e) {
-			e.printStackTrace();
+			LogHelper.getLogger().error("The remote URL is invalid.", e);
 			return null;
 		}
 	}

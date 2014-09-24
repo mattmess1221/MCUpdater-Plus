@@ -99,7 +99,7 @@ public class Downloader {
 				logger.info(String.format("Downloading %s (try %s).", destination.getName(), i));
 				flag = downloadFileWithHashCheck(source, destination, hash);
 			} catch (IOException e) {
-				e.printStackTrace();
+				logger.error("Unable to download " + destination.getName(), e);
 			}finally{
 				if(!flag){
 					logger.info(String.format("%s MD5 Failed after %s tries!", destination.getName(), tries));

@@ -44,7 +44,6 @@ dependencies {
 		exclude group: 'org.lwjgl.lwjgl', module: 'lwjgl'
 		exclude group: 'org.apache.logging.log4j'
 		exclude group: 'org.ow2.asm', module:'asm-debug-all'
-		exclude group: 'net.sf.jopt-simple', module: 'jopt-simple'
 	}
 	compile 'commons-io:commons-io:2.4'
 	compile 'com.google.guava:guava:15.0'

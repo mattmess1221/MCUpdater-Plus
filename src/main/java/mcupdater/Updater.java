@@ -35,8 +35,7 @@ public class Updater implements ITweaker {
 				try {
 					Downloader.downloadLibrary(remote);
 				} catch (IOException e) {
-					logger.error(String.format("Failed to download %s.", remote.getName()));
-					e.printStackTrace();
+					logger.error(String.format("Failed to download %s.", remote.getName()), e);
 				}
 			
 			LocalLibrary local = mcup.localLibraries.get(remote);

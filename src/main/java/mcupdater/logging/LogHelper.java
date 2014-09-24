@@ -2,11 +2,11 @@ package mcupdater.logging;
 
 import org.apache.logging.log4j.Level;
 
-
 public abstract class LogHelper {
 
 	protected static final String id = "MCUpdater Plus";
 	private static LogHelper instance = null;
+	private LogLevel level = LogLevel.INFO;
 	
 	public static LogHelper getLogger() {
 		if(instance == null){
@@ -26,6 +26,14 @@ public abstract class LogHelper {
 
 	protected abstract void throwing(LogLevel level, String message, Throwable throwable);
 	
+	public LogLevel getLevel(){
+		return this.level;
+	}
+
+	public void setLevel(LogLevel level){
+		this.level = level;
+	}
+
 	public void off(Object object) {
 		this.log(LogLevel.OFF, object);
 	}
@@ -90,20 +98,63 @@ public abstract class LogHelper {
 		this.throwing(LogLevel.ALL, message, throwable);
 	}
 	
-	protected static enum LogLevel {
+	public static enum LogLevel {
 		
-		OFF,
-		FATAL,
-		ERROR,
-		WARN,
-		INFO,
-		DEBUG,
-		TRACE, 
-		ALL
-		;
+		ALL(0),
+		TRACE(1),
+		DEBUG(2),
+		INFO(3),
+		WARN(4),
+		ERROR(5),
+		FATAL(6),
+		OFF(7);
+
+		private final int intValue;
+
+		private LogLevel(int level) {
+			this.intValue = level;
+		}
 		
 		public Level getLog4jLevel() {
 			return Level.valueOf(name());
+		}
+
+		public int getIntValue(){
+			return this.intValue;
+		}
+
+		public static LogLevel getLevel(int intValue) {
+			LogLevel result = null;
+			for(LogLevel level : values()) {
+				if(level.getIntValue() == intValue) {
+					result = level;
+					break;
+				}
+			}
+			return result;
+		}
+
+		public static LogLevel getLevel(String name) {
+			LogLevel result = null;
+			for(LogLevel level : values()) {
+				if(level.name().equalsIgnoreCase(name)) {
+					result = level;
+					break;
+				}
+			}
+			if(result == null && isNumber(name)){
+				result = getLevel(Integer.valueOf(name));
+			}
+			return result;
+		}
+
+		private static boolean isNumber(String string) {
+			try{
+				Integer.valueOf(string);
+				return true;
+			}catch(NumberFormatException nfe){
+				return false;
+			}
 		}
 	}
 }

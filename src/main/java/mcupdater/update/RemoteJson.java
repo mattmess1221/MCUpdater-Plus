@@ -26,76 +26,78 @@ import com.google.gson.JsonObject;
 
 public class RemoteJson extends AbstractJson {
 
-	private UpdatableList<RemoteMod> mods = new UpdatableList<RemoteMod>();
-	private UpdatableList<RemoteLibrary> libraries = new UpdatableList<RemoteLibrary>();
-	public List<String> tweaks = Lists.newArrayList();
-	private String additionalArguments;
-	private Config config;
-	private File cache = new File(UpdaterMain.gameDir, "localcache.json");
-	
-	public RemoteJson(Reader json) throws IOException {
-		super(json);
-		if(object.has("config"))
-			this.config = new Config(object.get("config"));
-		this.addMods(object.get("mods").getAsJsonArray());
-		if(object.has("libraries"))
-			this.addLibraries(object.get("libraries").getAsJsonArray());
-		if(object.has("tweakClasses"))
-			this.addTweaks(object.get("tweakClasses").getAsJsonArray());
-		if(object.has("additionalArguments"))
-			this.additionalArguments = object.get("additionalArguments").getAsString();
-		
-		// Saves cache
-		String string = gson.toJson(object);
-		FileUtils.writeStringToFile(this.cache, string);
-	}
-	
-	private void addTweaks(JsonArray array) {
-		for(JsonElement ele : array)
-			tweaks.add(ele.getAsString());
-	}
+    private UpdatableList<RemoteMod> mods = new UpdatableList<RemoteMod>();
+    private UpdatableList<RemoteLibrary> libraries = new UpdatableList<RemoteLibrary>();
+    public List<String> tweaks = Lists.newArrayList();
+    private String additionalArguments;
+    private Config config;
+    private File cache = new File(UpdaterMain.gameDir, "localcache.json");
 
-	private void addLibraries(JsonArray array) {
-		for(JsonElement ele : array)
-			libraries.add(new RemoteLibrary(ele.getAsJsonObject()));
-	}
+    public RemoteJson(Reader json) throws IOException {
+        super(json);
+        if (object.has("config"))
+            this.config = new Config(object.get("config"));
+        this.addMods(object.get("mods").getAsJsonArray());
+        if (object.has("libraries"))
+            this.addLibraries(object.get("libraries").getAsJsonArray());
+        if (object.has("tweakClasses"))
+            this.addTweaks(object.get("tweakClasses").getAsJsonArray());
+        if (object.has("additionalArguments"))
+            this.additionalArguments = object.get("additionalArguments").getAsString();
 
-	private void addMods(JsonArray array){
-		for(JsonElement ele : array){
-			if(!ele.isJsonObject()){
-				LogHelper.getLogger().warn("Encountered a non-object: " + ele.getAsString() + ". Skipping.");
-				break;
-			}
-			JsonObject obj = ele.getAsJsonObject();
-			if(obj.has("type") && obj.get("type").getAsString().equals("liteloader"))
-				mods.add(new RemoteLiteMod(obj));
-			else{
-				RemoteForgeMod mod = new RemoteForgeMod(obj);
-				if((Sides.SERVER.equals(Side.getSide()) && !Sides.CLIENT.equals(mod.getSide()))
-						|| (Sides.CLIENT.equals(Side.getSide()) && !Sides.SERVER.equals(mod.getSide())))
-					mods.add(mod);
-			}
-		}
-	}
-	
-	public RemoteJson(URL url) throws IOException{
-		this(new InputStreamReader(url.openStream()));
-	}
-	
-	public Config getConfig(){
-		return config;
-	}
-	
-	public UpdatableList<RemoteMod> getModsList(){
-		return mods;
-	}
+        // Saves cache
+        String string = gson.toJson(object);
+        FileUtils.writeStringToFile(this.cache, string);
+    }
 
-	public UpdatableList<RemoteLibrary> getLibrariesList(){
-		return this.libraries;
-	}
-	
-	public String getAdditionalArguments(){
-		return this.additionalArguments;
-	}
+    private void addTweaks(JsonArray array) {
+        for (JsonElement ele : array)
+            tweaks.add(ele.getAsString());
+    }
+
+    private void addLibraries(JsonArray array) {
+        for (JsonElement ele : array)
+            libraries.add(new RemoteLibrary(ele.getAsJsonObject()));
+    }
+
+    private void addMods(JsonArray array) {
+        for (JsonElement ele : array) {
+            if (!ele.isJsonObject()) {
+                LogHelper.getLogger().warn(
+                        "Encountered a non-object: " + ele.getAsString() + ". Skipping.");
+                break;
+            }
+            JsonObject obj = ele.getAsJsonObject();
+            if (obj.has("type") && obj.get("type").getAsString().equals("liteloader"))
+                mods.add(new RemoteLiteMod(obj));
+            else {
+                RemoteForgeMod mod = new RemoteForgeMod(obj);
+                if ((Sides.SERVER.equals(Side.getSide()) && !Sides.CLIENT.equals(mod.getSide()))
+                        || (Sides.CLIENT.equals(Side.getSide()) && !Sides.SERVER.equals(mod
+                                .getSide())))
+                    mods.add(mod);
+            }
+        }
+    }
+
+    public RemoteJson(URL url) throws IOException {
+        this(new InputStreamReader(url.openStream()));
+    }
+
+    public Config getConfig() {
+        return config;
+    }
+
+    public UpdatableList<RemoteMod> getModsList() {
+        return mods;
+    }
+
+    public UpdatableList<RemoteLibrary> getLibrariesList() {
+        return this.libraries;
+    }
+
+    public String getAdditionalArguments() {
+        return this.additionalArguments;
+    }
 
 }

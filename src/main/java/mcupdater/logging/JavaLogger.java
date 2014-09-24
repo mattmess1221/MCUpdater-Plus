@@ -9,43 +9,43 @@ import java.util.Calendar;
 
 public class JavaLogger extends LogHelper {
 
-	private final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-	private final Calendar calendar = Calendar.getInstance();
-	private PrintStream fileLogger = null;
-	
-	public JavaLogger() {
-		try {
-			this.fileLogger = new PrintStream(new File("mcupdater-plus.log"));
-		} catch (FileNotFoundException e) {
-			this.warn("Log file cannot be accessed.", e);
-		}
-	}
-	
-	@Override
-	protected void log(LogLevel level, Object object) {
-		String out = createPrefix(calendar, level, id) + object.toString();
-		if(shouldWrite(this.getLevel()))
-			System.out.println(out);
-		if(fileLogger != null)
-			fileLogger.println(out);
-	}
+    private final DateFormat date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+    private final Calendar calendar = Calendar.getInstance();
+    private PrintStream fileLogger = null;
 
-	@Override
-	protected void throwing(LogLevel level, String message, Throwable throwable) {
-		if(message == null || message.isEmpty())
-			message = throwable.getLocalizedMessage();
-		log(level, message);
-		if(shouldWrite(this.getLevel()))
-			throwable.printStackTrace();
-		if(fileLogger != null)
-			throwable.printStackTrace(this.fileLogger);
-	}
-	
-	private String createPrefix(Calendar calendar, LogLevel level, String id){
-		return String.format("%s [%s] [%s] ", date.format(calendar.getTime()), level.name(), id);
-	}
+    public JavaLogger() {
+        try {
+            this.fileLogger = new PrintStream(new File("mcupdater-plus.log"));
+        } catch (FileNotFoundException e) {
+            this.warn("Log file cannot be accessed.", e);
+        }
+    }
 
-	private boolean shouldWrite(LogLevel currentLevel){
-		return currentLevel.getIntValue() <= this.getLevel().getIntValue();
-	}
+    @Override
+    protected void log(LogLevel level, Object object) {
+        String out = createPrefix(calendar, level, id) + object.toString();
+        if (shouldWrite(this.getLevel()))
+            System.out.println(out);
+        if (fileLogger != null)
+            fileLogger.println(out);
+    }
+
+    @Override
+    protected void throwing(LogLevel level, String message, Throwable throwable) {
+        if (message == null || message.isEmpty())
+            message = throwable.getLocalizedMessage();
+        log(level, message);
+        if (shouldWrite(this.getLevel()))
+            throwable.printStackTrace();
+        if (fileLogger != null)
+            throwable.printStackTrace(this.fileLogger);
+    }
+
+    private String createPrefix(Calendar calendar, LogLevel level, String id) {
+        return String.format("%s [%s] [%s] ", date.format(calendar.getTime()), level.name(), id);
+    }
+
+    private boolean shouldWrite(LogLevel currentLevel) {
+        return currentLevel.getIntValue() <= this.getLevel().getIntValue();
+    }
 }

@@ -14,39 +14,39 @@ group = 'mcupdater'
 archivesBaseName = 'MCUpdaterPlus'
 
 repositories {
-	mavenCentral()
-	maven {
-		name = 'minecraft'
-		url = 'https://libraries.minecraft.net/'
-	}
+    mavenCentral()
+    maven {
+        name = 'minecraft'
+        url = 'https://libraries.minecraft.net/'
+    }
 }
 
 buildscript {
-	repositories {
-		mavenCentral()
-	}
-	dependencies {
+    repositories {
+        mavenCentral()
+    }
+    dependencies {
         classpath group: 'org.ajoberstar', name: 'gradle-git', version: '0.8.0'
-	}
+    }
 }
 
 jar {
-	manifest{
-		attributes 'Main-Class': mainClassName
-	}
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
 }
 
 dependencies {
-	compile 'com.google.code.gson:gson:2.2.4'
-	compile 'org.apache.logging.log4j:log4j-api:2.0.2'
-	runtime 'org.apache.logging.log4j:log4j-core:2.0.2'
-	compile ('net.minecraft:launchwrapper:1.11'){
-		exclude group: 'org.lwjgl.lwjgl', module: 'lwjgl'
-		exclude group: 'org.apache.logging.log4j'
-		exclude group: 'org.ow2.asm', module:'asm-debug-all'
-	}
-	compile 'commons-io:commons-io:2.4'
-	compile 'com.google.guava:guava:15.0'
+    compile 'com.google.code.gson:gson:2.2.4'
+    compile 'org.apache.logging.log4j:log4j-api:2.0.2'
+    runtime 'org.apache.logging.log4j:log4j-core:2.0.2'
+    compile ('net.minecraft:launchwrapper:1.11'){
+        exclude group: 'org.lwjgl.lwjgl', module: 'lwjgl'
+        exclude group: 'org.apache.logging.log4j'
+        exclude group: 'org.ow2.asm', module:'asm-debug-all'
+    }
+    compile 'commons-io:commons-io:2.4'
+    compile 'com.google.guava:guava:15.0'
 }
 
 release {

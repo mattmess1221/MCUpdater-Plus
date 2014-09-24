@@ -16,57 +16,57 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class Updater implements ITweaker {
 
-	private static final LogHelper logger = LogHelper.getLogger();
-	private UpdaterMain mcup;
-	
-	@Override
-	public void acceptOptions(List<String> args, File gameDir, File assetsDir,
-			String profile) {
-		Side.setSide(Sides.CLIENT);
-		mcup = new UpdaterMain(gameDir);
-		mcup.main(args.toArray(new String[args.size()]));
-	}
+    private static final LogHelper logger = LogHelper.getLogger();
+    private UpdaterMain mcup;
 
-	@Override
-	public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-		mcup.readLibraries(new File(Platform.getMinecraftHome(), "libraries"));
-		for(RemoteLibrary remote : mcup.getRemoteJson().getLibrariesList()){
-			if(!remote.installed())
-				try {
-					Downloader.downloadLibrary(remote);
-				} catch (IOException e) {
-					logger.error(String.format("Failed to download %s.", remote.getName()), e);
-				}
-			
-			LocalLibrary local = mcup.localLibraries.get(remote);
-			//if(local != null)
-			try {
-				local.loadLibrary(classLoader);
-			} catch (MalformedURLException e) {
-				logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
-			}
-		}
-		
-		// Add cascaded tweaks
-		for(String tweak : mcup.getRemoteJson().tweaks){
-			if(!tweak.contains("liteloader"))
-			registerTweak(tweak);
-		}
-	}
+    @Override
+    public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
+        Side.setSide(Sides.CLIENT);
+        mcup = new UpdaterMain(gameDir);
+        mcup.main(args.toArray(new String[args.size()]));
+    }
 
-	@Override
-	public String getLaunchTarget() {
-		return "net.minecraft.client.main.Main";
-	}
+    @Override
+    public void injectIntoClassLoader(LaunchClassLoader classLoader) {
+        mcup.readLibraries(new File(Platform.getMinecraftHome(), "libraries"));
+        for (RemoteLibrary remote : mcup.getRemoteJson().getLibrariesList()) {
+            if (!remote.installed())
+                try {
+                    Downloader.downloadLibrary(remote);
+                } catch (IOException e) {
+                    logger.error(String.format("Failed to download %s.", remote.getName()), e);
+                }
 
-	@Override
-	public String[] getLaunchArguments() {
-		return new String[0];
-	}
+            LocalLibrary local = mcup.localLibraries.get(remote);
+            // if(local != null)
+            try {
+                local.loadLibrary(classLoader);
+            } catch (MalformedURLException e) {
+                logger.error(
+                        String.format("Failed to load library: %s.", local.getFile().getPath()), e);
+            }
+        }
 
-	@SuppressWarnings("unchecked")
-	private void registerTweak(String tweak){
-		List<String> tweaks = (List<String>) Launch.blackboard.get("TweakClasses");
-		tweaks.add(tweak);
-	}
+        // Add cascaded tweaks
+        for (String tweak : mcup.getRemoteJson().tweaks) {
+            if (!tweak.contains("liteloader"))
+                registerTweak(tweak);
+        }
+    }
+
+    @Override
+    public String getLaunchTarget() {
+        return "net.minecraft.client.main.Main";
+    }
+
+    @Override
+    public String[] getLaunchArguments() {
+        return new String[0];
+    }
+
+    @SuppressWarnings("unchecked")
+    private void registerTweak(String tweak) {
+        List<String> tweaks = (List<String>) Launch.blackboard.get("TweakClasses");
+        tweaks.add(tweak);
+    }
 }

@@ -6,31 +6,30 @@ import mcupdater.update.IUpdatable;
 
 public abstract class LocalMod extends AbstractMod {
 
-	protected String name;
-	protected String version;
-	protected File file;
-	
+    protected String name;
+    protected String version;
+    protected File file;
 
-	public String getName() {
-		return name;
-	}
+    public String getName() {
+        return name;
+    }
 
-	public String getModID() {
-		return modid;
-	}
+    public String getModID() {
+        return modid;
+    }
 
-	public String getVersion() {
-		return version;
-	}
+    public String getVersion() {
+        return version;
+    }
 
-	public String getFile() {
-		return file.getPath();
-	}
-	
-	@Override
-	public boolean equals(IUpdatable mod){
-		// TODO
-		return false;
-		
-	}
+    public String getFile() {
+        return file.getPath();
+    }
+
+    @Override
+    public boolean equals(IUpdatable mod) {
+        // TODO
+        return false;
+
+    }
 }

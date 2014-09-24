@@ -5,16 +5,16 @@ import java.net.PasswordAuthentication;
 
 public class DLAuthenticator extends Authenticator {
 
-	private String userName;
-	private char[] password;
+    private String userName;
+    private char[] password;
 
-	public DLAuthenticator(String username, String password){
-		this.userName = username;
-		this.password = password.toCharArray();
-	}
+    public DLAuthenticator(String username, String password) {
+        this.userName = username;
+        this.password = password.toCharArray();
+    }
 
-	@Override
-	public PasswordAuthentication getPasswordAuthentication(){
-		return new PasswordAuthentication(userName, password);
-	}
+    @Override
+    public PasswordAuthentication getPasswordAuthentication() {
+        return new PasswordAuthentication(userName, password);
+    }
 }

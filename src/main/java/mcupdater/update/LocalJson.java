@@ -70,7 +70,7 @@ public class LocalJson extends AbstractJson {
             return new URL(repo + (repo.endsWith("/") ? "" : "/") + modpack + "/" + version + "/");
         } catch (MalformedURLException e) {
             LogHelper.getLogger().error("The remote URL is invalid.", e);
-            return null;
+            throw (new RuntimeException());
         }
     }
 
@@ -81,9 +81,16 @@ public class LocalJson extends AbstractJson {
         return false;
     }
 
-    private URL getRemoteJson() throws MalformedURLException {
+    public URL getRemoteJson() {
         String s = getRemotePackURL().toString();
-        return new URL(s + "pack.json");
+        URL url = null;
+        try {
+            url = new URL(s + "pack.json");
+        } catch (MalformedURLException e) {
+            LogHelper.getLogger().error(e.getLocalizedMessage());
+            throw (new RuntimeException());
+        }
+        return url;
     }
 
     public RemoteJson getRemotePack() throws IOException {

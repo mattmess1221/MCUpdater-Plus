@@ -10,6 +10,7 @@ import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import mcupdater.download.Downloader;
+import mcupdater.gui.ProgressWindow;
 import mcupdater.logging.LogHelper;
 import mcupdater.logging.LogHelper.LogLevel;
 import mcupdater.update.Config;
@@ -22,7 +23,6 @@ import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
 
 import com.google.common.collect.Lists;
-import com.google.gson.Gson;
 import com.google.gson.JsonSyntaxException;
 
 public class UpdaterMain {
@@ -33,30 +33,47 @@ public class UpdaterMain {
     public static File gameDir;
     private RemoteJson remote;
     private LocalJson local;
+    private ProgressWindow window;
     private static UpdaterMain instance;
 
     public UpdaterMain() {
-        gameDir = new File(System.getProperty("user.dir"));
-        instance = this;
+        this(new File("."));
     }
 
     public UpdaterMain(File file) {
         gameDir = file;
+        window = ProgressWindow.newWindow();
         instance = this;
     }
 
     public void main(String[] args) {
         logger.info("Starting Updater");
         parseArguments(args);
+        window.setVisible(true);
         File modpack = new File(gameDir, "modpack.json");
         if (modpack.exists()) {
             try {
+                window.setCurrentTask("Reading modpack info.", false);
                 readJson(modpack);
             } catch (MalformedURLException e) {
                 logger.warn("Modpack URL is invalid.", e);
             }
+            window.setCurrentTask("Scanning installed mods.", false);
             readMods(new File(gameDir, "mods"));
+            window.setCurrentTask("Reading " + local.getRemoteJson().toString() + ".", false);
             getInfo();
+            window.setMaximum(remote.getModsList().size() + (remote.getConfig() != null ?1:0));
+            window.release();
+            try {
+                Config config = remote.getConfig();
+                if (config != null) {
+                    window.setCurrentTask("Downloading configs", false);
+                    config.updateConfigs();
+                    window.setCurrentTask("", true);
+                }
+            } catch (IOException ioe) {
+                logger.error("Unable to extract configs", ioe);
+            }
             if (local.getMCVersion().equals(remote.getMCVersion()))
                 compareMods();
             else
@@ -64,6 +81,7 @@ public class UpdaterMain {
         } else {
             logger.warn("modpack.json not found!");
         }
+        window.dispose();
         logger.info("Everything up to date.");
 
     }
@@ -90,20 +108,12 @@ public class UpdaterMain {
     private void getInfo() {
         try {
             this.remote = this.local.getRemotePack();
-            Config config = remote.getConfig();
-            if (config != null)
-                config.updateConfigs();
-        } catch (MalformedURLException e) {
-            logger.error("Bad URL in modpack.json", e);
-            throw (new RuntimeException());
         } catch (IOException e) {
             logger.error(
-                    String.format("Could not open modpack definition %s", local.getRemotePackURL()),
-                    e);
+                    String.format("Could not open modpack definition %s", local.getRemoteJson()), e);
             throw (new RuntimeException());
         } catch (JsonSyntaxException e) {
-            logger.error(String.format("Bad JSON in %spack.json\n%s", local.getRemotePackURL(),
-                    new Gson().toJson(remote.getJsonObject())));
+            logger.error(String.format("Bad JSON in %s", local.getRemoteJson()), e);
             throw (new RuntimeException());
         }
     }
@@ -111,15 +121,18 @@ public class UpdaterMain {
     private void compareMods() {
         for (RemoteMod remote : this.remote.getModsList()) {
             if (!remote.isEnabled()) {
+                window.setCurrentTask("", true);
                 logger.info("Skipping " + remote.getModID());
                 continue;
             }
+            window.setCurrentTask("Downloading " + remote.getName(), false);
             if (!compareContainer(remote))
                 try {
                     Downloader.downloadMod(remote);
                 } catch (MalformedURLException e) {
                     logger.warn(remote.getName() + "'s download is invalid.", e);
                 }
+            window.setCurrentTask("", true);
         }
     }
 
@@ -129,6 +142,9 @@ public class UpdaterMain {
                 if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
                     logger.info("Updating " + local.getName() + " " + local.getVersion() + " to "
                             + remote.getVersion());
+                    window.setCurrentTask(
+                            String.format("Updating %s %s to %s", local.getName(),
+                                    local.getVersion(), remote.getVersion()), false);
                     try {
                         Downloader.downloadMod(remote, local);
                     } catch (MalformedURLException e) {

@@ -8,13 +8,10 @@ import java.net.URL;
 import java.util.List;
 
 import mcupdater.Side;
-import mcupdater.Side.Sides;
 import mcupdater.UpdatableList;
 import mcupdater.UpdaterMain;
 import mcupdater.logging.LogHelper;
 import mcupdater.update.libs.RemoteLibrary;
-import mcupdater.update.mods.RemoteForgeMod;
-import mcupdater.update.mods.RemoteLiteMod;
 import mcupdater.update.mods.RemoteMod;
 
 import org.apache.commons.io.FileUtils;
@@ -22,7 +19,6 @@ import org.apache.commons.io.FileUtils;
 import com.google.common.collect.Lists;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
 
 public class RemoteJson extends AbstractJson {
 
@@ -37,7 +33,8 @@ public class RemoteJson extends AbstractJson {
         super(json);
         if (object.has("config"))
             this.config = new Config(object.get("config"));
-        this.addMods(object.get("mods").getAsJsonArray());
+        if (object.has("mods"))
+            this.addMods(object.get("mods").getAsJsonArray());
         if (object.has("libraries"))
             this.addLibraries(object.get("libraries").getAsJsonArray());
         if (object.has("tweakClasses"))
@@ -67,16 +64,10 @@ public class RemoteJson extends AbstractJson {
                         "Encountered a non-object: " + ele.getAsString() + ". Skipping.");
                 break;
             }
-            JsonObject obj = ele.getAsJsonObject();
-            if (obj.has("type") && obj.get("type").getAsString().equals("liteloader"))
-                mods.add(new RemoteLiteMod(obj));
-            else {
-                RemoteForgeMod mod = new RemoteForgeMod(obj);
-                if ((Sides.SERVER.equals(Side.getSide()) && !Sides.CLIENT.equals(mod.getSide()))
-                        || (Sides.CLIENT.equals(Side.getSide()) && !Sides.SERVER.equals(mod
-                                .getSide())))
-                    mods.add(mod);
-            }
+
+            RemoteMod mod = RemoteMod.getMod(ele.getAsJsonObject());
+            if (mod != null && Side.getSide() == mod.getSide())
+                mods.add(mod);
         }
     }
 

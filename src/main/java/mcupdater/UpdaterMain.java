@@ -17,7 +17,6 @@ import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
 import mcupdater.update.RemoteJson;
 import mcupdater.update.libs.LocalLibrary;
-import mcupdater.update.mods.LocalForgeMod;
 import mcupdater.update.mods.LocalLiteMod;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
@@ -62,7 +61,7 @@ public class UpdaterMain {
             readMods(new File(gameDir, "mods"));
             window.setCurrentTask("Reading " + local.getRemoteJson().toString() + ".", false);
             getInfo();
-            window.setMaximum(remote.getModsList().size() + (remote.getConfig() != null ?1:0));
+            window.setMaximum(remote.getModsList().size() + (remote.getConfig() != null ? 1 : 0));
             window.release();
             try {
                 Config config = remote.getConfig();
@@ -193,10 +192,9 @@ public class UpdaterMain {
     }
 
     private void addMod(File file) throws IOException {
-        if (file.getName().endsWith(".litemod")) {
-            localMods.add(new LocalLiteMod(file));
-        } else if (file.getName().endsWith(".jar") || file.getName().endsWith(".zip"))
-            localMods.add(new LocalForgeMod(file));
+        LocalMod mod = LocalMod.getMod(file);
+        if (mod != null)
+            localMods.add(mod);
     }
 
     public static UpdaterMain getInstance() {

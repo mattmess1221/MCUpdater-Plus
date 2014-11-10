@@ -11,6 +11,7 @@ import joptsimple.OptionParser;
 import joptsimple.OptionSet;
 import mcupdater.download.Downloader;
 import mcupdater.gui.ProgressWindow;
+import mcupdater.gui.UpdateWindow;
 import mcupdater.logging.LogHelper;
 import mcupdater.logging.LogHelper.LogLevel;
 import mcupdater.update.Config;
@@ -32,7 +33,7 @@ public class UpdaterMain {
     public static File gameDir;
     private RemoteJson remote;
     private LocalJson local;
-    private ProgressWindow window;
+    private UpdateWindow window;
     private static UpdaterMain instance;
 
     public UpdaterMain() {

@@ -2,6 +2,7 @@ package mcupdater.gui;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GraphicsEnvironment;
 import java.awt.SystemColor;
 import java.awt.Toolkit;
 
@@ -15,9 +16,10 @@ import javax.swing.border.EmptyBorder;
 
 import mcupdater.logging.LogHelper;
 
-public class ProgressWindow extends JDialog {
+public class ProgressWindow extends JDialog implements UpdateWindow {
 
     private static final long serialVersionUID = 6963326800689896105L;
+    private static final boolean HEADLESS = GraphicsEnvironment.isHeadless();
     private JProgressBar progressBar;
     private JLabel lblCurrentItem;
     static {
@@ -28,9 +30,14 @@ public class ProgressWindow extends JDialog {
         }
     }
 
-    public static ProgressWindow newWindow() {
-        ProgressWindow instance = new ProgressWindow();
-        instance.setDefaultCloseOperation(HIDE_ON_CLOSE);
+    public static UpdateWindow newWindow() {
+        UpdateWindow instance;
+        if (!HEADLESS) {
+            instance = new ProgressWindow();
+            ((JDialog) instance).setDefaultCloseOperation(HIDE_ON_CLOSE);
+        } else {
+            instance = new DummyWindow();
+        }
         return instance;
     }
 
@@ -82,6 +89,7 @@ public class ProgressWindow extends JDialog {
         return progressBar;
     }
 
+    @Override
     public void setCurrentTask(String newString, boolean increment) {
         if (increment)
             progressBar.setValue(progressBar.getValue() + 1);
@@ -89,14 +97,17 @@ public class ProgressWindow extends JDialog {
                 + String.format(" (%s of %s)", progressBar.getValue() + 1, progressBar.getMaximum()));
     }
 
+    @Override
     public void release() {
         progressBar.setIndeterminate(false);
     }
 
+    @Override
     public void setMaximum(int n) {
         progressBar.setMaximum(n);
     }
 
+    @Override
     public void setString(String text) {
         lblCurrentItem.setText(text);
     }

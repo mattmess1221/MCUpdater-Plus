@@ -4,7 +4,6 @@ import mcupdater.update.IUpdatable;
 
 public abstract class AbstractLibrary implements ILibrary {
 
-    @Override
     public boolean equals(IUpdatable updatable) {
         if (updatable == null || !(updatable instanceof ILibrary))
             return false;

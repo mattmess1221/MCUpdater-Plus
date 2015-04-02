@@ -6,10 +6,8 @@ package mcupdater.update.mods;
  */
 public class RemoteFileMod extends RemoteMod {
 
-    String md5;
-
     @Override
     public String getVersion() {
-        return this.md5;
+        return this.getMD5();
     }
 }

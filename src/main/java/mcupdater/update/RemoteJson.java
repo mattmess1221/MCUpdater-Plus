@@ -10,8 +10,9 @@ import com.google.common.collect.Lists;
 
 public class RemoteJson extends AbstractJson {
 
-    private UpdatableList<RemoteMod> mods = new UpdatableList<RemoteMod>();
-    private UpdatableList<RemoteLibrary> libraries = new UpdatableList<RemoteLibrary>();
+    private UpdatableList<RemoteMod> mods;
+    private RemoteRepo<RemoteLibrary> libraries;
+    private RemoteRepo<RemoteMod> repo;
     public List<String> tweaks = Lists.newArrayList();
     private String additionalArguments;
     private Config config;
@@ -24,8 +25,12 @@ public class RemoteJson extends AbstractJson {
         return mods;
     }
 
-    public UpdatableList<RemoteLibrary> getLibrariesList() {
+    public RemoteRepo<RemoteLibrary> getLibrariesRepository() {
         return this.libraries;
+    }
+
+    public RemoteRepo<RemoteMod> getModsRepository() {
+        return repo;
     }
 
     public String getAdditionalArguments() {

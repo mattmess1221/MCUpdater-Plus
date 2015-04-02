@@ -1,11 +1,10 @@
 package mcupdater.update.mods;
 
 import java.io.File;
-import java.io.IOException;
 
 import mcupdater.logging.LogHelper;
 
-public abstract class LocalMod extends AbstractMod {
+public abstract class LocalMod implements IMod {
 
     private final File file;
 
@@ -17,7 +16,7 @@ public abstract class LocalMod extends AbstractMod {
         return file.getPath();
     }
 
-    public static LocalMod getMod(File file) throws IOException {
+    public static LocalMod getMod(File file) {
         LocalMod mod = null;
         String ext = file.getName().substring(file.getName().lastIndexOf(".") + 1);
         try {

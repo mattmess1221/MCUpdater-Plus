@@ -26,7 +26,7 @@ public class LocalLibrary extends AbstractLibrary {
         List<String> list = Lists.newArrayList();
         File g = name.getParentFile();
         while (true) {
-            if (g.getName().equals("libraries"))
+            if (g.getName().equals(getTopLevelName()))
                 break;
             list.add(g.getName());
             g = g.getParentFile();
@@ -42,6 +42,10 @@ public class LocalLibrary extends AbstractLibrary {
         this.name = name.getName();
         this.version = version.getName();
 
+    }
+
+    protected String getTopLevelName() {
+        return "libraries";
     }
 
     @Override

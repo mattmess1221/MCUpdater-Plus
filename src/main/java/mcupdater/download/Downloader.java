@@ -11,7 +11,6 @@ import java.net.URLConnection;
 import mcupdater.Platform;
 import mcupdater.UpdaterMain;
 import mcupdater.logging.LogHelper;
-import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
@@ -86,9 +85,6 @@ public class Downloader {
         } catch (FileNotFoundException e) {
             downloadFile(u, file);
         }
-
-        UpdaterMain.getInstance().localLibraries.add(new LocalLibrary(file));
-
     }
 
     private static void downloadFileWithHashCheck(URL source, File destination, String hash, int tries) {

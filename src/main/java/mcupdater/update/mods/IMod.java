@@ -4,10 +4,8 @@ import mcupdater.update.IUpdatable;
 
 public interface IMod extends IUpdatable {
 
-    public String getModID();
+    String getModID();
 
-    public String getVersion();
-
-    public String getFile();
+    String getName();
 
 }

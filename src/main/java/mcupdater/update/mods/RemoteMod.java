@@ -11,7 +11,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParseException;
 
-public abstract class RemoteMod extends AbstractMod {
+public abstract class RemoteMod implements IMod {
 
     private static UpdaterMain mcup = UpdaterMain.getInstance();
 
@@ -36,7 +36,6 @@ public abstract class RemoteMod extends AbstractMod {
         return this.version;
     }
 
-    @Override
     public String getFile() {
         return this.file;
     }

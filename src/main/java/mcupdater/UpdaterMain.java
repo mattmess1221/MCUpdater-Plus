@@ -5,7 +5,6 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.List;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
@@ -17,6 +16,7 @@ import mcupdater.logging.LogHelper;
 import mcupdater.logging.LogHelper.LogLevel;
 import mcupdater.update.Config;
 import mcupdater.update.LocalJson;
+import mcupdater.update.LocalRepo;
 import mcupdater.update.RemoteJson;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.mods.LocalLiteMod;
@@ -26,7 +26,7 @@ import mcupdater.update.mods.RemoteMod;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 
-import com.google.common.collect.Lists;
+import com.google.common.base.Function;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
@@ -36,7 +36,8 @@ public class UpdaterMain {
     private static final LogHelper logger = LogHelper.getLogger();
 
     public UpdatableList<LocalMod> localMods = new UpdatableList<LocalMod>();
-    public UpdatableList<LocalLibrary> localLibraries = new UpdatableList<LocalLibrary>();
+    public LocalRepo<LocalMod> modsRepo;
+    public LocalRepo<LocalLibrary> libraryRepo;
 
     public File gameDir;
     private File localCache;
@@ -70,6 +71,12 @@ public class UpdaterMain {
                 readJson(modpack);
             } catch (MalformedURLException e) {
                 logger.warn("Modpack URL is invalid.", e);
+            }
+            try {
+                window.setCurrentTask("Setting up local repos", false);
+                setupRepos();
+            } catch (IOException e) {
+                logger.warn("Error while setting up repos", e);
             }
             window.setCurrentTask("Scanning installed mods.", false);
             readMods(new File(gameDir, "mods"));
@@ -209,7 +216,7 @@ public class UpdaterMain {
 
     private void readMods(File modsDir) {
         modsDir.mkdirs();
-        for (File file : modsDir.listFiles())
+        for (File file : modsDir.listFiles()) {
             try {
                 if (file.isFile())
                     addMod(file);
@@ -223,6 +230,25 @@ public class UpdaterMain {
             } catch (Exception e) {
                 logger.error("Unable to read mod file " + file.getName() + " (" + e.getMessage() + ")");
             }
+        }
+    }
+
+    private void setupRepos() throws IOException {
+        this.modsRepo = new LocalRepo<LocalMod>(this.local.getLocalRepo(), new Function<File, LocalMod>() {
+
+            @Override
+            public LocalMod apply(File input) {
+                return LocalMod.getMod(input);
+            }
+        });
+        File libraries = new File(Platform.getMinecraftHome(), "libraries");
+        libraryRepo = new LocalRepo<LocalLibrary>(libraries, new Function<File, LocalLibrary>() {
+
+            @Override
+            public LocalLibrary apply(File input) {
+                return new LocalLibrary(input);
+            }
+        });
     }
 
     private void addMod(File file) throws IOException {
@@ -243,26 +269,5 @@ public class UpdaterMain {
 
     public RemoteJson getRemoteJson() {
         return remote;
-    }
-
-    public void readLibraries(File file) {
-        List<File> libs = getRecursiveChildren(file);
-        for (File lib : libs) {
-            localLibraries.add(new LocalLibrary(lib));
-        }
-    }
-
-    private List<File> getRecursiveChildren(File file) {
-        List<File> files = Lists.newArrayList();
-        if (file.exists())
-            if (file.isFile())
-                files.add(file);
-            else
-                for (File lib : file.listFiles())
-                    if (lib.isDirectory())
-                        files.addAll(getRecursiveChildren(lib));
-                    else if (lib.getName().endsWith(".jar"))
-                        files.add(lib);
-        return files;
     }
 }

@@ -8,25 +8,34 @@ import mcupdater.Platform;
 
 public class RemoteLibrary extends AbstractLibrary {
 
-    private String group;
-    private String name;
-    private String version;
-    private String url;
-    private String classifier;
+    String artifact;
+    String url;
 
     @Override
     public String getGroup() {
-        return group;
+        return artifact.split(":")[0];
     }
 
     @Override
     public String getName() {
-        return name;
+        return artifact.split(":")[1];
     }
 
     @Override
     public String getVersion() {
-        return version;
+        return artifact.split(":")[2];
+    }
+
+    public boolean hasClassifier() {
+        return artifact.split(":").length == 4;
+    }
+
+    public String getClassifier() {
+        return artifact.split(":")[3];
+    }
+
+    public String getArtifactID() {
+        return artifact;
     }
 
     public String getURL() {
@@ -35,20 +44,12 @@ public class RemoteLibrary extends AbstractLibrary {
         return url + (url.endsWith("/") ? "" : "/");
     }
 
-    public String getClassifier() {
-        return classifier;
-    }
-
     public boolean installed() {
         return getLocalFile().exists();
     }
 
-    public boolean hasClassifier() {
-        return classifier != null;
-    }
-
     public String getRelativePathForDownload() {
-        return getParentPath() + (hasClassifier() ? "-" + classifier : "") + ".jar";
+        return getParentPath() + (hasClassifier() ? "-" + getClassifier() : "") + ".jar";
     }
 
     public String getRelativePath() {
@@ -56,7 +57,8 @@ public class RemoteLibrary extends AbstractLibrary {
     }
 
     private String getParentPath() {
-        return group.replace('.', '/') + "/" + name + "/" + version + "/" + name + "-" + version;
+        return getGroup().replace('.', '/') + "/" + getName() + "/" + getVersion() + "/" + getName() + "-"
+                + getVersion();
     }
 
     private File getLocalFile() {

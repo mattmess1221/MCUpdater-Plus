@@ -14,34 +14,23 @@ import java.util.zip.ZipInputStream;
 import mcupdater.UpdaterMain;
 import mcupdater.logging.LogHelper;
 
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.annotations.SerializedName;
 
 public class Config {
 
-    private LogHelper logger = LogHelper.getLogger();
-    private File gameDir;
-    private URL remoteFile;
-    private String remoteVersion = "";
-    private String localVersion = "";
-    private boolean shouldUpdate;
-    private UpdaterMain mcup = UpdaterMain.getInstance();
+    private static final LogHelper logger = LogHelper.getLogger();
 
-    /**
-     * 
-     * @param jsonElement the config object. Check for nulls here.
-     * @param gameDir the Game Directory
-     * @throws IOException
-     */
-    public Config(JsonElement jsonElement) throws IOException {
-        this.gameDir = UpdaterMain.gameDir;
+    private transient File gameDir;
+    private transient String localVersion = "";
+
+    private String file;
+    @SerializedName("version")
+    private String remoteVersion = "";
+
+    public Config() throws IOException {
+        this.gameDir = UpdaterMain.getInstance().gameDir;
         localVersion = getLocalVersion(gameDir);
-        remoteVersion = getRemoteVersion(getJsonObject(jsonElement));
-        remoteFile = getRemoteFile(getJsonObject(jsonElement), mcup.getLocalJson().getRemotePackURL().toString());
-        shouldUpdate = !localVersion.equals(remoteVersion);
-        if (shouldUpdate) {
-            logger.info("Config updates avaliable");
-        }
+
     }
 
     private String getLocalVersion(File gameDir) throws IOException {
@@ -57,35 +46,18 @@ public class Config {
         return sb.toString();
     }
 
-    private String getRemoteVersion(JsonObject config) {
-        if (config == null)
-            return null;
-        return config.get("version").getAsString();
-    }
-
-    private URL getRemoteFile(JsonObject object, String repo) throws MalformedURLException {
-        if (object == null)
-            return null;
-        String url = object.get("file").getAsString();
-        if (url.startsWith("http")) {
-            return new URL(url);
-        }
-        return new URL(repo + url);
-    }
-
-    private JsonObject getJsonObject(JsonElement jsonElement) {
-        if (jsonElement != null)
-            return jsonElement.getAsJsonObject();
-        return null;
+    private boolean shouldUpdate() {
+        return !localVersion.equals(remoteVersion);
     }
 
     public void updateConfigs() throws IOException {
-        if (!shouldUpdate) {
+        if (!shouldUpdate()) {
             logger.info("Configs up to date.");
             return;
         }
+        logger.info("Config updates avaliable");
         logger.info("Downloading Configs.");
-        ZipInputStream zip = new ZipInputStream(remoteFile.openStream());
+        ZipInputStream zip = new ZipInputStream(getRemoteFile().openStream());
 
         ZipEntry entry = zip.getNextEntry();
         while (entry != null) {
@@ -116,6 +88,14 @@ public class Config {
         }
         zip.close();
         saveVersion();
+    }
+
+    private URL getRemoteFile() throws MalformedURLException {
+        String repo = UpdaterMain.getInstance().getLocalJson().getRemotePackURL().toString();
+        if (file.matches("^(https?|file):\\/\\/")) {
+            return new URL(file);
+        }
+        return new URL(repo + file);
     }
 
     private void saveVersion() throws IOException {

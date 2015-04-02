@@ -2,6 +2,7 @@ package mcupdater;
 
 import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
@@ -22,18 +23,27 @@ import mcupdater.update.mods.LocalLiteMod;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
 
+import org.apache.commons.io.FileUtils;
+import org.apache.commons.io.IOUtils;
+
 import com.google.common.collect.Lists;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
 public class UpdaterMain {
 
     private static final LogHelper logger = LogHelper.getLogger();
+
     public UpdatableList<LocalMod> localMods = new UpdatableList<LocalMod>();
     public UpdatableList<LocalLibrary> localLibraries = new UpdatableList<LocalLibrary>();
-    public static File gameDir;
+
+    public File gameDir;
+    private File localCache;
     private RemoteJson remote;
     private LocalJson local;
     private UpdateWindow window;
+
     private static UpdaterMain instance;
 
     public UpdaterMain() {
@@ -42,6 +52,7 @@ public class UpdaterMain {
 
     public UpdaterMain(File file) {
         gameDir = file;
+        localCache = new File(gameDir, "localcache.json");
         window = ProgressWindow.newWindow();
         instance = this;
     }
@@ -52,6 +63,8 @@ public class UpdaterMain {
         window.setVisible(true);
         File modpack = new File(gameDir, "modpack.json");
         if (modpack.exists()) {
+
+            // local things
             try {
                 window.setCurrentTask("Reading modpack info.", false);
                 readJson(modpack);
@@ -61,7 +74,10 @@ public class UpdaterMain {
             window.setCurrentTask("Scanning installed mods.", false);
             readMods(new File(gameDir, "mods"));
             window.setCurrentTask("Reading " + local.getRemoteJson().toString() + ".", false);
+
+            // remote
             getInfo();
+
             window.setMaximum(remote.getModsList().size() + (remote.getConfig() != null ? 1 : 0));
             window.release();
             try {
@@ -106,14 +122,30 @@ public class UpdaterMain {
 
     private void getInfo() {
         try {
-            this.remote = this.local.getRemotePack();
+            this.remote = getRemotePack(this.local);
         } catch (IOException e) {
             logger.error(String.format("Could not open modpack definition %s", local.getRemoteJson()), e);
-            throw (new RuntimeException());
+            throw new RuntimeException(e);
         } catch (JsonSyntaxException e) {
             logger.error(String.format("Bad JSON in %s", local.getRemoteJson()), e);
-            throw (new RuntimeException());
+            throw new RuntimeException(e);
         }
+    }
+
+    private RemoteJson getRemotePack(LocalJson local) throws IOException {
+        String json;
+        try {
+            json = IOUtils.toString(local.getRemoteJson().openStream());
+        } catch (IOException e) {
+            if (localCache.exists() && localCache.isFile()) {
+                LogHelper.getLogger().warn("Unable to connect to update server.  Using local backup cache.");
+                json = FileUtils.readFileToString(localCache);
+            } else
+                throw new IOException("Unable to access remote and local cache doesn't exist or is not a file.", e);
+        }
+
+        return new GsonBuilder().registerTypeAdapter(RemoteMod.class, new RemoteMod.Serializer()).create()
+                .fromJson(json, RemoteJson.class);
     }
 
     private void compareMods() {
@@ -137,7 +169,7 @@ public class UpdaterMain {
     private boolean compareContainer(RemoteMod remote) {
         for (LocalMod local : localMods) {
             if (remote.getModID().equalsIgnoreCase(local.getModID())) {
-                if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
+                if (!remote.getVersion().equalsIgnoreCase(local.getVersion())) {
                     logger.info("Updating " + local.getName() + " " + local.getVersion() + " to " + remote.getVersion());
                     window.setCurrentTask(
                             String.format("Updating %s %s to %s", local.getName(), local.getVersion(),
@@ -163,10 +195,15 @@ public class UpdaterMain {
     }
 
     private void readJson(File json) throws MalformedURLException {
+        FileReader fr = null;
         try {
-            this.local = new LocalJson(json);
+            fr = new FileReader(json);
+            this.local = new Gson().fromJson(fr, LocalJson.class);
+            this.local.authenticate();
         } catch (FileNotFoundException e) {
             logger.error("Local modpack.json not found.", e);
+        } finally {
+            IOUtils.closeQuietly(fr);
         }
     }
 

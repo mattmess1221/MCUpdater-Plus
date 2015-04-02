@@ -4,36 +4,59 @@ import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.Reader;
 import java.util.zip.ZipFile;
 
-import com.google.gson.JsonObject;
+import org.apache.commons.io.IOUtils;
+
+import com.google.gson.Gson;
 
 public class LocalLiteMod extends LocalMod {
 
-    private String revision;
+    private LiteModJson json;
 
     public LocalLiteMod(File file) throws IOException {
-        this.file = file;
-        ZipFile litemod = new ZipFile(file);
-        InputStream json = litemod.getInputStream(litemod.getEntry("litemod.json"));
-        JsonObject object = gson.fromJson(new InputStreamReader(json), JsonObject.class);
-        if (json != null) {
-            this.name = object.get("name").getAsString();
-            this.modid = object.get("name").getAsString();
-            this.version = object.get("version").getAsString();
-            this.revision = object.get("revision").getAsString();
+        super(file);
+
+        ZipFile litemod = null;
+        InputStream in = null;
+        Reader reader = null;
+
+        try {
+            litemod = new ZipFile(file);
+            in = litemod.getInputStream(litemod.getEntry("litemod.json"));
+            reader = new InputStreamReader(in);
+            json = new Gson().fromJson(reader, LiteModJson.class);
+        } finally {
+            IOUtils.closeQuietly(reader);
+            IOUtils.closeQuietly(in);
+            IOUtils.closeQuietly(litemod);
         }
-        json.close();
-        litemod.close();
+    }
+
+    @Override
+    public String getModID() {
+        return json.name;
+    }
+
+    @Override
+    public String getName() {
+        return json.name;
     }
 
     @Override
     public String getVersion() {
-        return revision;
+        return json.revision;
     }
 
     public String getReadableVersion() {
-        return version;
+        return json.version;
     }
 
+    private class LiteModJson {
+
+        private String name;
+        private String version;
+        private String revision;
+    }
 }

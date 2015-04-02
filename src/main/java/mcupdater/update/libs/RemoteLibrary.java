@@ -6,8 +6,6 @@ import java.net.URL;
 
 import mcupdater.Platform;
 
-import com.google.gson.JsonObject;
-
 public class RemoteLibrary extends AbstractLibrary {
 
     private String group;
@@ -15,17 +13,6 @@ public class RemoteLibrary extends AbstractLibrary {
     private String version;
     private String url;
     private String classifier;
-
-    public RemoteLibrary(JsonObject obj) {
-        this.name = obj.get("name").getAsString();
-        this.version = obj.get("version").getAsString();
-        this.group = obj.get("group").getAsString();
-        if (obj.has("url"))
-            this.url = obj.get("url").getAsString();
-        if (obj.has("classifier"))
-            this.classifier = obj.get("classifier").getAsString();
-
-    }
 
     @Override
     public String getGroup() {

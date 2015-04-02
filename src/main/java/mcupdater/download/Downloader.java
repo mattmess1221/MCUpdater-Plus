@@ -27,7 +27,7 @@ public class Downloader {
 
     private static final LogHelper logger = LogHelper.getLogger();
     private final static File MC_DIR = Platform.getMinecraftHome();
-    private final static File GAME_DIR = UpdaterMain.gameDir;
+    private final static File GAME_DIR = UpdaterMain.getInstance().gameDir;
     private final static File MODS_DIR = new File(GAME_DIR, "mods");
     private final static File LIBRARIES_DIR = new File(MC_DIR, "libraries");
     private static final String DEFAULT_LIBRARY_URL = "https://libraries.minecraft.net/";

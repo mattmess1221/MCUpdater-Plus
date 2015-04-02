@@ -1,30 +1,29 @@
 package mcupdater.update.mods;
 
+import java.lang.reflect.Type;
+
 import mcupdater.Side;
 import mcupdater.UpdaterMain;
 
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import com.google.gson.JsonParseException;
 
 public abstract class RemoteMod extends AbstractMod {
 
-    protected String version;
-    private String url;
+    private static UpdaterMain mcup = UpdaterMain.getInstance();
+
+    private String modid;
+    private String version;
+    private String file;
     private String md5;
-    private Side.Sides side;
-    private boolean enabled;
-    private UpdaterMain mcup = UpdaterMain.getInstance();
+    private Side.Sides side = Side.getSide();
 
-    public RemoteMod(JsonObject object) {
-        this.modid = object.get("modid").getAsString();
-        this.url = object.get("file").getAsString();
-        if (object.has("md5"))
-            this.md5 = object.get("md5").getAsString();
-        if (object.has("side"))
-            side = Side.Sides.valueOf(object.get("side").getAsString());
-        else
-            side = Side.getSide();
-
-        enabled = !mcup.getLocalJson().isModDisabled(modid);
+    @Override
+    public String getModID() {
+        return this.modid;
     }
 
     @Override
@@ -39,7 +38,7 @@ public abstract class RemoteMod extends AbstractMod {
 
     @Override
     public String getFile() {
-        return this.url;
+        return this.file;
     }
 
     public String getMD5() {
@@ -51,29 +50,36 @@ public abstract class RemoteMod extends AbstractMod {
     }
 
     public boolean isEnabled() {
-        return enabled;
+        return !mcup.getLocalJson().isModDisabled(getModID());
     }
 
     public Side.Sides getSide() {
         return side;
     }
 
-    public static RemoteMod getMod(JsonObject object) {
-        RemoteMod mod = null;
-        String type;
-        if (object.has("type")) {
-            type = object.get("type").getAsString();
-        } else {
-            type = "forge";
-        }
-        if (type.equals("forge")) {
-            mod = new RemoteForgeMod(object);
-        } else if (type.equals("liteloader")) {
-            mod = new RemoteLiteMod(object);
-        } else if (type.equals("file")) {
-            mod = new RemoteFileMod(object);
-        }
+    public static class Serializer implements JsonDeserializer<RemoteMod> {
 
-        return mod;
+        @Override
+        public RemoteMod deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
+                throws JsonParseException {
+            JsonObject object = json.getAsJsonObject();
+            Type modType = null;
+            String type = "forge";
+            if (object.has("type")) {
+                type = object.get("type").getAsString();
+            }
+
+            if (type.equals("forge")) {
+                modType = RemoteForgeMod.class;
+            } else if (type.equals("liteloader")) {
+                modType = RemoteLiteMod.class;
+            } else if (type.equals("file")) {
+                modType = RemoteFileMod.class;
+            } else {
+                throw new IllegalArgumentException("Unknown mod type: " + type);
+            }
+
+            return context.deserialize(json, modType);
+        }
     }
 }

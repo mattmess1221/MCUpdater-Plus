@@ -60,8 +60,7 @@ public class RemoteJson extends AbstractJson {
     private void addMods(JsonArray array) {
         for (JsonElement ele : array) {
             if (!ele.isJsonObject()) {
-                LogHelper.getLogger().warn(
-                        "Encountered a non-object: " + ele.getAsString() + ". Skipping.");
+                LogHelper.getLogger().warn("Encountered a non-object: " + ele.getAsString() + ". Skipping.");
                 break;
             }
 

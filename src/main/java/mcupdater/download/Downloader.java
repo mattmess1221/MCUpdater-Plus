@@ -70,8 +70,7 @@ public class Downloader {
 
     }
 
-    public static void downloadLibrary(RemoteLibrary library) throws MalformedURLException,
-            IOException {
+    public static void downloadLibrary(RemoteLibrary library) throws MalformedURLException, IOException {
         String url = DEFAULT_LIBRARY_URL;
         if (library.getURL() != null)
             url = library.getURL();
@@ -92,8 +91,7 @@ public class Downloader {
 
     }
 
-    private static void downloadFileWithHashCheck(URL source, File destination, String hash,
-            int tries) {
+    private static void downloadFileWithHashCheck(URL source, File destination, String hash, int tries) {
         boolean flag = false;
         int i = 0;
         while (!flag && i < tries) {
@@ -104,8 +102,7 @@ public class Downloader {
                 logger.error("Unable to download " + destination.getName(), e);
             } finally {
                 if (!flag) {
-                    logger.info(String.format("%s MD5 Failed after %s tries!",
-                            destination.getName(), tries));
+                    logger.info(String.format("%s MD5 Failed after %s tries!", destination.getName(), tries));
                     destination.delete();
                 } else {
                     logger.info(destination.getName() + " MD5 Verified");
@@ -117,8 +114,7 @@ public class Downloader {
 
     private static void downloadFile(URL source, File destination) throws IOException {
         URLConnection conn = source.openConnection();
-        conn.setRequestProperty(
-                "User-Agent",
+        conn.setRequestProperty("User-Agent",
                 "Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/35.0.1916.114 Safari/537.36");
         InputStream in = conn.getInputStream();
 
@@ -126,19 +122,17 @@ public class Downloader {
         in.close();
     }
 
-    private static boolean downloadFileWithHashCheck(URL source, File destination, String md5sum)
-            throws IOException {
+    private static boolean downloadFileWithHashCheck(URL source, File destination, String md5sum) throws IOException {
         return downloadFileWithHashCheck(source, destination, md5sum, Hashing.md5());
     }
 
-    private static boolean downloadFileWithHashCheck(URL source, File destination, String hash,
-            HashFunction hashType) throws IOException {
+    private static boolean downloadFileWithHashCheck(URL source, File destination, String hash, HashFunction hashType)
+            throws IOException {
         downloadFile(source, destination);
         return checkHash(destination, hash, hashType);
     }
 
-    private static boolean checkHash(File file, String hash, HashFunction hashType)
-            throws IOException {
+    private static boolean checkHash(File file, String hash, HashFunction hashType) throws IOException {
         HashCode hashCode = Files.hash(file, hashType);
         return hashCode.toString().equals(hash);
     }

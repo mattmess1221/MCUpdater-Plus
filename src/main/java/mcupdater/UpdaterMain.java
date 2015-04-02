@@ -91,9 +91,8 @@ public class UpdaterMain {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         // log level
-        ArgumentAcceptingOptionSpec<String> argLogLevel = parser
-                .accepts("updaterLogLevel", "The log level to use.").withRequiredArg()
-                .defaultsTo("INFO");
+        ArgumentAcceptingOptionSpec<String> argLogLevel = parser.accepts("updaterLogLevel", "The log level to use.")
+                .withRequiredArg().defaultsTo("INFO");
         OptionSet optionSet = parser.parse(args);
 
         // Set the log level
@@ -109,8 +108,7 @@ public class UpdaterMain {
         try {
             this.remote = this.local.getRemotePack();
         } catch (IOException e) {
-            logger.error(
-                    String.format("Could not open modpack definition %s", local.getRemoteJson()), e);
+            logger.error(String.format("Could not open modpack definition %s", local.getRemoteJson()), e);
             throw (new RuntimeException());
         } catch (JsonSyntaxException e) {
             logger.error(String.format("Bad JSON in %s", local.getRemoteJson()), e);
@@ -140,11 +138,10 @@ public class UpdaterMain {
         for (LocalMod local : localMods) {
             if (remote.getModID().equalsIgnoreCase(local.getModID())) {
                 if (!local.getVersion().equalsIgnoreCase(remote.getVersion())) {
-                    logger.info("Updating " + local.getName() + " " + local.getVersion() + " to "
-                            + remote.getVersion());
+                    logger.info("Updating " + local.getName() + " " + local.getVersion() + " to " + remote.getVersion());
                     window.setCurrentTask(
-                            String.format("Updating %s %s to %s", local.getName(),
-                                    local.getVersion(), remote.getVersion()), false);
+                            String.format("Updating %s %s to %s", local.getName(), local.getVersion(),
+                                    remote.getVersion()), false);
                     try {
                         Downloader.downloadMod(remote, local);
                     } catch (MalformedURLException e) {
@@ -187,8 +184,7 @@ public class UpdaterMain {
                     }
                 }
             } catch (Exception e) {
-                logger.error("Unable to read mod file " + file.getName() + " (" + e.getMessage()
-                        + ")");
+                logger.error("Unable to read mod file " + file.getName() + " (" + e.getMessage() + ")");
             }
     }
 

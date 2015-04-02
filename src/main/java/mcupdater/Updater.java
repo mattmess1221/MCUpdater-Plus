@@ -42,8 +42,7 @@ public class Updater implements ITweaker {
             try {
                 local.loadLibrary(classLoader);
             } catch (MalformedURLException e) {
-                logger.error(
-                        String.format("Failed to load library: %s.", local.getFile().getPath()), e);
+                logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
             }
         }
 

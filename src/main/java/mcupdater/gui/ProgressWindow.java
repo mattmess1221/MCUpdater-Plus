@@ -93,8 +93,7 @@ public class ProgressWindow extends JDialog implements UpdateWindow {
     public void setCurrentTask(String newString, boolean increment) {
         if (increment)
             progressBar.setValue(progressBar.getValue() + 1);
-        setString(newString
-                + String.format(" (%s of %s)", progressBar.getValue() + 1, progressBar.getMaximum()));
+        setString(newString + String.format(" (%s of %s)", progressBar.getValue() + 1, progressBar.getMaximum()));
     }
 
     @Override

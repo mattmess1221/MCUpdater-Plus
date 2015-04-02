@@ -37,8 +37,7 @@ public class Config {
         this.gameDir = UpdaterMain.gameDir;
         localVersion = getLocalVersion(gameDir);
         remoteVersion = getRemoteVersion(getJsonObject(jsonElement));
-        remoteFile = getRemoteFile(getJsonObject(jsonElement), mcup.getLocalJson()
-                .getRemotePackURL().toString());
+        remoteFile = getRemoteFile(getJsonObject(jsonElement), mcup.getLocalJson().getRemotePackURL().toString());
         shouldUpdate = !localVersion.equals(remoteVersion);
         if (shouldUpdate) {
             logger.info("Config updates avaliable");

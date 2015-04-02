@@ -27,8 +27,7 @@ public class LibraryClassLoader {
         try {
             logger.info(String.format("Loading library %s.", modFile.getPath()));
             URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method addURL = URLClassLoader.class.getDeclaredMethod("addURL",
-                    new Class[] { URL.class });
+            Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
             addURL.setAccessible(true);
             addURL.invoke(classLoader, url);
         } catch (Exception e) {

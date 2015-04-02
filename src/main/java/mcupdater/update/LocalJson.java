@@ -100,8 +100,7 @@ public class LocalJson extends AbstractJson {
                 reader = new InputStreamReader(getRemoteJson().openStream());
             } catch (IOException e) {
                 if (localCache.exists() && localCache.isFile()) {
-                    LogHelper.getLogger().warn(
-                            "Unable to connect to update server.  Using local backup cache.");
+                    LogHelper.getLogger().warn("Unable to connect to update server.  Using local backup cache.");
                     reader = new FileReader(localCache);
                 } else
                     throw new IOException(e);

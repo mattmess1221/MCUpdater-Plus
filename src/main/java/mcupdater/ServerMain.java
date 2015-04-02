@@ -19,8 +19,7 @@ public class ServerMain {
         if (new ServerMain().loadMCJar()) {
             new UpdaterMain().main(args);
         } else {
-            System.out
-                    .println("Warning: Minecraft Server not found in user dir.  Unable to update!");
+            System.out.println("Warning: Minecraft Server not found in user dir.  Unable to update!");
         }
     }
 

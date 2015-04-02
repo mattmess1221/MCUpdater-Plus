@@ -45,8 +45,7 @@ public abstract class LocalMod extends AbstractMod {
             }
         } catch (Exception e) {
             LogHelper.getLogger().warn(
-                    file.getName() + " is invalid. "
-                            + String.format("(%s)", e.getLocalizedMessage()));
+                    file.getName() + " is invalid. " + String.format("(%s)", e.getLocalizedMessage()));
             mod = new LocalFileMod(file);
         }
         return mod;

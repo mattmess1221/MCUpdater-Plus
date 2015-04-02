@@ -2,31 +2,21 @@ apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'eclipse'
 apply plugin: 'maven'
-apply plugin: 'grgit-release'
-
-import org.ajoberstar.grgit.*
 
 targetCompatibility = 1.6
 sourceCompatibility = 1.6
 
-ext.mainClassName = 'mcupdater.ServerMain'
 group = 'mcupdater'
+
+version = "0.2-SNAPSHOT"
 archivesBaseName = 'MCUpdaterPlus'
 
 repositories {
     mavenCentral()
     maven {
+        // for launchwrapper
         name = 'minecraft'
         url = 'https://libraries.minecraft.net/'
-    }
-}
-
-buildscript {
-    repositories {
-        mavenCentral()
-    }
-    dependencies {
-        classpath group: 'org.ajoberstar', name: 'gradle-git', version: '0.8.0'
     }
 }
 
@@ -39,8 +29,3 @@ dependencies {
     compile 'commons-io:commons-io:2.4'
     compile 'com.google.guava:guava:15.0'
 }
-
-release {
-    grgit = Grgit.open(project.file('.'))
-}
-

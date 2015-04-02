@@ -1,7 +1,5 @@
 package mcupdater.logging;
 
-import org.apache.logging.log4j.Level;
-
 public abstract class LogHelper {
 
     protected static final String id = "MCUpdater Plus";
@@ -113,10 +111,6 @@ public abstract class LogHelper {
 
         private LogLevel(int level) {
             this.intValue = level;
-        }
-
-        public Level getLog4jLevel() {
-            return Level.valueOf(name());
         }
 
         public int getIntValue() {

@@ -31,7 +31,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.google.gson.JsonSyntaxException;
 
-public class UpdaterMain {
+public class Updater {
 
     private static final LogHelper logger = LogHelper.getLogger();
 
@@ -45,20 +45,25 @@ public class UpdaterMain {
     private LocalJson local;
     private UpdateWindow window;
 
-    private static UpdaterMain instance;
+    private static Updater instance;
 
-    public UpdaterMain() {
+    public Updater() {
         this(new File("."));
     }
 
-    public UpdaterMain(File file) {
+    public Updater(File file) {
         gameDir = file;
         localCache = new File(gameDir, "localcache.json");
         window = ProgressWindow.newWindow();
         instance = this;
     }
 
-    public void main(String[] args) {
+    public static void main(final String[] args) throws Exception {
+        Side.setSide(Side.Sides.SERVER);
+        new Updater().run(args);
+    }
+
+    public void run(String[] args) {
         logger.info("Starting Updater");
         parseArguments(args);
         window.setVisible(true);
@@ -257,9 +262,9 @@ public class UpdaterMain {
             localMods.add(mod);
     }
 
-    public static UpdaterMain getInstance() {
+    public static Updater getInstance() {
         if (instance == null)
-            instance = new UpdaterMain();
+            instance = new Updater();
         return instance;
     }
 

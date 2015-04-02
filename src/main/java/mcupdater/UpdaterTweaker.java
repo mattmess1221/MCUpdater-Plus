@@ -18,39 +18,24 @@ import net.minecraft.launchwrapper.LaunchClassLoader;
 public class UpdaterTweaker implements ITweaker {
 
     private static final LogHelper logger = LogHelper.getLogger();
-    private UpdaterMain mcup;
+    private Updater updater;
+
+    public UpdaterTweaker() {
+        Side.setSide(Sides.CLIENT);
+    }
 
     @Override
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
-        Side.setSide(Sides.CLIENT);
-        mcup = new UpdaterMain(gameDir);
-        mcup.main(args.toArray(new String[args.size()]));
+        updater = new Updater(gameDir);
+        updater.run(args.toArray(new String[args.size()]));
     }
 
     @Override
     public void injectIntoClassLoader(LaunchClassLoader classLoader) {
-        for (RemoteLibrary remote : mcup.getRemoteJson().getLibrariesRepository().getArtifacts()) {
-            if (!remote.installed())
-                try {
-                    Downloader.downloadLibrary(remote);
-                } catch (IOException e) {
-                    logger.error(String.format("Failed to download %s.", remote.getName()), e);
-                }
-
-            Artifact<LocalLibrary> local = mcup.libraryRepo.findArtifact(remote.getArtifactID());
-            // if(local != null)
-            try {
-                local.getArtifact().loadLibrary(classLoader);
-            } catch (MalformedURLException e) {
-                logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
-            }
-        }
+        loadLibraries(classLoader);
 
         // Add cascaded tweaks
-        for (String tweak : mcup.getRemoteJson().tweaks) {
-            if (!tweak.contains("liteloader"))
-                registerTweak(tweak);
-        }
+        registerTweaks();
     }
 
     @Override
@@ -63,8 +48,33 @@ public class UpdaterTweaker implements ITweaker {
         return new String[0];
     }
 
+    private void loadLibraries(LaunchClassLoader classLoader) {
+        for (RemoteLibrary remote : updater.getRemoteJson().getLibrariesRepository().getArtifacts()) {
+            if (!remote.installed()) {
+                try {
+                    Downloader.downloadLibrary(remote);
+                } catch (IOException e) {
+                    logger.error(String.format("Failed to download %s.", remote.getName()), e);
+                }
+            }
+            Artifact<LocalLibrary> local = updater.libraryRepo.findArtifact(remote.getArtifactID());
+
+            try {
+                local.getArtifact().loadLibrary(classLoader);
+            } catch (MalformedURLException e) {
+                logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
+            }
+        }
+    }
+
+    private void registerTweaks() {
+        for (String tweak : updater.getRemoteJson().tweaks) {
+            registerTweak(tweak);
+        }
+    }
+
     @SuppressWarnings("unchecked")
-    private void registerTweak(String tweak) {
+    protected void registerTweak(String tweak) {
         List<String> tweaks = (List<String>) Launch.blackboard.get("TweakClasses");
         tweaks.add(tweak);
     }

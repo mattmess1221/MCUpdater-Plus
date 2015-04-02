@@ -9,7 +9,7 @@ import java.net.URL;
 import java.net.URLConnection;
 
 import mcupdater.Platform;
-import mcupdater.UpdaterMain;
+import mcupdater.Updater;
 import mcupdater.logging.LogHelper;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.LocalMod;
@@ -26,12 +26,12 @@ public class Downloader {
 
     private static final LogHelper logger = LogHelper.getLogger();
     private final static File MC_DIR = Platform.getMinecraftHome();
-    private final static File GAME_DIR = UpdaterMain.getInstance().gameDir;
+    private final static File GAME_DIR = Updater.getInstance().gameDir;
     private final static File MODS_DIR = new File(GAME_DIR, "mods");
     private final static File LIBRARIES_DIR = new File(MC_DIR, "libraries");
     private static final String DEFAULT_LIBRARY_URL = "https://libraries.minecraft.net/";
 
-    private static URL repo = UpdaterMain.getInstance().getLocalJson().getRemotePackURL();
+    private static URL repo = Updater.getInstance().getLocalJson().getRemotePackURL();
 
     public static void downloadMod(RemoteMod remote) throws MalformedURLException {
         downloadMod(remote, null);

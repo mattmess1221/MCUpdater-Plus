@@ -11,7 +11,7 @@ import java.net.URL;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
-import mcupdater.UpdaterMain;
+import mcupdater.Updater;
 import mcupdater.logging.LogHelper;
 
 import com.google.gson.annotations.SerializedName;
@@ -28,7 +28,7 @@ public class Config {
     private String remoteVersion = "";
 
     public Config() throws IOException {
-        this.gameDir = UpdaterMain.getInstance().gameDir;
+        this.gameDir = Updater.getInstance().gameDir;
         localVersion = getLocalVersion(gameDir);
 
     }
@@ -91,7 +91,7 @@ public class Config {
     }
 
     private URL getRemoteFile() throws MalformedURLException {
-        String repo = UpdaterMain.getInstance().getLocalJson().getRemotePackURL().toString();
+        String repo = Updater.getInstance().getLocalJson().getRemotePackURL().toString();
         if (file.matches("^(https?|file):\\/\\/")) {
             return new URL(file);
         }

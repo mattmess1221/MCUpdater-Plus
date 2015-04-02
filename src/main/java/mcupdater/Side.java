@@ -9,7 +9,7 @@ public class Side {
 
     private static Sides side;
 
-    public static void setSide(Sides sides) {
+    static void setSide(Sides sides) {
         side = sides;
     }
 

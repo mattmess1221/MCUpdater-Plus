@@ -3,7 +3,7 @@ package mcupdater.update.mods;
 import java.lang.reflect.Type;
 
 import mcupdater.Side;
-import mcupdater.UpdaterMain;
+import mcupdater.Updater;
 
 import com.google.gson.JsonDeserializationContext;
 import com.google.gson.JsonDeserializer;
@@ -13,7 +13,7 @@ import com.google.gson.JsonParseException;
 
 public abstract class RemoteMod implements IMod {
 
-    private static UpdaterMain mcup = UpdaterMain.getInstance();
+    private static Updater mcup = Updater.getInstance();
 
     private String modid;
     private String version;

@@ -1,5 +1,5 @@
 {
-	"mcversion": "1.7.2",
+	"mcversion": "1.7.10",
 	"config": {
 		"file": "config.zip",
 		"version": "1"
@@ -7,73 +7,36 @@
 	"mods":[
 		{
 			"modid": "EE3",
-			"version": "0.2",
-			"file": "mods/EquivalentExchange3-0.2.jar",
-			"type": "forge",
-			"md5": "084ea47ec23e024fec1ea12448684b7c"
-		},
-		{
-			"modid": "BuildCraft|Core",
-			"version": "5.0.5",
-			"file": "mods/buildcraft-5.0.5.jar",
-			"type": "forge",
-			"md5": "f6c5eb3eec0cf5ba3871828d718a75ed"
-		},
-		{
-			"modid": "Thaumcraft",
-			"version": "1.7.2-4.1.1.12",
-			"file": "https://dl.dropboxusercontent.com/u/47135879/Thaumcraft-1.7.2-4.1.1.12.jar",
-			"type": "forge",
-			"md5": "a23999f97590c909833263f452ab6104"
-		},
-		{
-			"modid": "voxelcam",
-			"revision": "24",
-			"file": "http://applefreak.voxelmodpack.com/moduploads/voxelcam/mod_VoxelCam_1.3.0_mc1.7.2.litemod",
-			"type": "liteloader",
-			"md5": "f9bff3178201807a535a83af0be70466"
+			"version": "1.7.10-0.2.453",
+			"file": "mods/EquivalentExchange3-1.7.10-0.2.453.jar"
 		},
 		{
 			"modid": "journeymap",
-			"version": "4.0.2",
-			"file": "http://addons.cursecdn.com/files/2209/394/JourneyMap4.0.2_FairPlay_MC1.7.2.jar#JourneyMap4.0.2_FairPlay_MC1.7.2.jar",
-			"side": "client"
+			"version": "5.0.1",
+			"file": "http://addons-origin.cursecdn.com/files/2221/282/JourneyMap5.0.1_FairPlay_MC1.7.10.jar",
+            "md5": "30506f81bdd3512d9f512f1e152d8e71"
 		}
 	],
+	"repo": "maven",
+	"repoMods": [
+		"net.chickenbones.nei:NotEnoughItems:1.7.10-1.0.3.74:universal",
+		"net.chickenbones.core:CodeChickenCore:1.7.10-1.0.4.29:universal"
+	],
 	"tweakClasses":[
-		"cpw.mods.fml.common.launcher.FMLTweaker",
-		"com.mumfrey.liteloader.launch.LiteLoaderTweaker"
+		"cpw.mods.fml.common.launcher.FMLTweaker"
 	],
 	"additionalArguments": "--foo bar",
 	"libraries": [
 		{
 			"group": "net.minecraftforge",
 			"name": "forge",
-			"version": "1.7.2-10.12.1.1060",
+			"version": "1.7.10-10.13.2.1352",
 			"url": "http://files.minecraftforge.net/maven/"
-		},
-		{
-			"group": "com.mumfrey",
-			"name": "liteloader",
-			"version": "1.7.2",
-			"url": "http://dl.liteloader.com/versions/"
 		},
 		{
 			"group": "org.ow2.asm",
 			"name": "asm-all",
-			"version": "4.1"
-		},
-		{
-			"group": "org.scala-lang",
-			"name": "scala-library",
-			"version": "2.10.2",
-			"url": "http://files.minecraftforge.net/maven/"
-		},
-		{
-			"group": "org.scala-lang",
-			"name": "scala-compiler",
-			"version": "2.10.2",
-			"url": "http://files.minecraftforge.net/maven/"
+			"version": "5.0.4"
 		}
 	]
 }

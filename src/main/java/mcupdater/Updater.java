@@ -5,6 +5,8 @@ import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URL;
 
 import joptsimple.ArgumentAcceptingOptionSpec;
 import joptsimple.OptionParser;
@@ -14,10 +16,13 @@ import mcupdater.gui.ProgressWindow;
 import mcupdater.gui.UpdateWindow;
 import mcupdater.logging.LogHelper;
 import mcupdater.logging.LogHelper.LogLevel;
+import mcupdater.update.Artifact;
 import mcupdater.update.Config;
+import mcupdater.update.LocalArtifact;
 import mcupdater.update.LocalJson;
-import mcupdater.update.LocalRepo;
+import mcupdater.update.LocalRepository;
 import mcupdater.update.RemoteJson;
+import mcupdater.update.Repository;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.mods.LocalLiteMod;
 import mcupdater.update.mods.LocalMod;
@@ -36,8 +41,8 @@ public class Updater {
     private static final LogHelper logger = LogHelper.getLogger();
 
     public UpdatableList<LocalMod> localMods = new UpdatableList<LocalMod>();
-    public LocalRepo<LocalMod> modsRepo;
-    public LocalRepo<LocalLibrary> libraryRepo;
+    public LocalRepository<LocalMod> modsRepo;
+    public LocalRepository<LocalLibrary> libraryRepo;
 
     public File gameDir;
     private File localCache;
@@ -90,7 +95,7 @@ public class Updater {
             // remote
             getInfo();
 
-            window.setMaximum(remote.getModsList().size() + (remote.getConfig() != null ? 1 : 0));
+            window.setMaximum(remote.getModsSize() + (remote.getConfig() != null ? 1 : 0));
             window.release();
             try {
                 Config config = remote.getConfig();
@@ -103,7 +108,7 @@ public class Updater {
                 logger.error("Unable to extract configs", ioe);
             }
             if (local.getMCVersion().equals(remote.getMCVersion()))
-                compareMods();
+                updateMods();
             else
                 logger.info("Local pack mcversion mismatches remote.  Not downloading mods.");
         } else {
@@ -119,8 +124,8 @@ public class Updater {
         OptionParser parser = new OptionParser();
         parser.allowsUnrecognizedOptions();
         // log level
-        ArgumentAcceptingOptionSpec<String> argLogLevel = parser.accepts("updaterLogLevel", "The log level to use.")
-                .withRequiredArg().defaultsTo("INFO");
+        ArgumentAcceptingOptionSpec<String> argLogLevel =
+                parser.accepts("updaterLogLevel", "The log level to use.").withRequiredArg().defaultsTo("INFO");
         OptionSet optionSet = parser.parse(args);
 
         // Set the log level
@@ -156,15 +161,21 @@ public class Updater {
                 throw new IOException("Unable to access remote and local cache doesn't exist or is not a file.", e);
         }
 
-        return new GsonBuilder().registerTypeAdapter(RemoteMod.class, new RemoteMod.Serializer()).create()
+        return new GsonBuilder().registerTypeAdapter(RemoteMod.class, new RemoteMod.Serializer())
+                .registerTypeAdapter(Artifact.class, new Artifact.Serializer()).create()
                 .fromJson(json, RemoteJson.class);
     }
 
-    private void compareMods() {
+    private void updateMods() {
+        compareModsDir();
+        updateModsRepo();
+    }
+
+    private void compareModsDir() {
         for (RemoteMod remote : this.remote.getModsList()) {
             if (!remote.isEnabled()) {
                 window.setCurrentTask("", true);
-                logger.info("Skipping " + remote.getModID());
+                logger.debug("Skipping " + remote.getModID());
                 continue;
             }
             window.setCurrentTask("Downloading " + remote.getName(), false);
@@ -175,6 +186,42 @@ public class Updater {
                     logger.warn(remote.getName() + "'s download is invalid.", e);
                 }
             window.setCurrentTask("", true);
+        }
+    }
+
+    private void updateModsRepo() {
+        if (remote.getModsRepo() == null)
+            return;
+        // setup remote repo
+        URL url;
+        try {
+            URI uri = URI.create(this.remote.getModsRepo());
+            if (uri.isAbsolute()) {
+                url = uri.toURL();
+            } else {
+                url = new URL(this.local.getRemoteRepo() + "/" + uri);
+            }
+        } catch (MalformedURLException e) {
+            logger.warn("Invalid remote mods maven repo url.", e);
+            return;
+        }
+        Repository repo = new Repository(url);
+
+        // check that versions are installed
+        for (Artifact artifact : this.remote.getRepoMods()) {
+            LocalArtifact<LocalMod> local = new LocalArtifact<LocalMod>(this.modsRepo, artifact.getArtifactID());
+            if (!local.getFile().exists()) {
+                try {
+                    logger.info("Downloading " + artifact.getArtifactID());
+                    window.setCurrentTask("Downloading " + artifact.getArtifactID().split(":")[2], false);
+                    Downloader.downloadArtifact(repo, artifact, this.modsRepo);
+                    window.setCurrentTask("", true);
+                } catch (IOException e) {
+                    logger.warn("Unable to download " + artifact.getArtifactID(), e);
+                }
+            } else {
+                logger.debug(artifact.getArtifactID() + " is installed");
+            }
         }
     }
 
@@ -197,7 +244,7 @@ public class Updater {
                         version = ((LocalLiteMod) local).getReadableVersion();
                     else
                         version = local.getVersion();
-                    logger.info(local.getModID() + " " + version + " is up to date.");
+                    logger.debug(local.getModID() + " " + version + " is up to date.");
                 }
                 return true;
             }
@@ -239,7 +286,7 @@ public class Updater {
     }
 
     private void setupRepos() throws IOException {
-        this.modsRepo = new LocalRepo<LocalMod>(this.local.getLocalRepo(), new Function<File, LocalMod>() {
+        this.modsRepo = new LocalRepository<LocalMod>(this.local.getLocalRepo(), new Function<File, LocalMod>() {
 
             @Override
             public LocalMod apply(File input) {
@@ -247,7 +294,7 @@ public class Updater {
             }
         });
         File libraries = new File(Platform.getMinecraftHome(), "libraries");
-        libraryRepo = new LocalRepo<LocalLibrary>(libraries, new Function<File, LocalLibrary>() {
+        libraryRepo = new LocalRepository<LocalLibrary>(libraries, new Function<File, LocalLibrary>() {
 
             @Override
             public LocalLibrary apply(File input) {

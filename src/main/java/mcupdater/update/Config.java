@@ -52,7 +52,7 @@ public class Config {
 
     public void updateConfigs() throws IOException {
         if (!shouldUpdate()) {
-            logger.info("Configs up to date.");
+            logger.debug("Configs up to date.");
             return;
         }
         logger.info("Config updates avaliable");

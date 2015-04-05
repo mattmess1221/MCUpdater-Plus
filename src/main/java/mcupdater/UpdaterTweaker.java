@@ -8,7 +8,7 @@ import java.util.List;
 import mcupdater.Side.Sides;
 import mcupdater.download.Downloader;
 import mcupdater.logging.LogHelper;
-import mcupdater.update.Artifact;
+import mcupdater.update.LocalArtifact;
 import mcupdater.update.libs.LocalLibrary;
 import mcupdater.update.libs.RemoteLibrary;
 import net.minecraft.launchwrapper.ITweaker;
@@ -49,7 +49,7 @@ public class UpdaterTweaker implements ITweaker {
     }
 
     private void loadLibraries(LaunchClassLoader classLoader) {
-        for (RemoteLibrary remote : updater.getRemoteJson().getLibrariesRepository().getArtifacts()) {
+        for (RemoteLibrary remote : updater.getRemoteJson().getLibraries()) {
             if (!remote.installed()) {
                 try {
                     Downloader.downloadLibrary(remote);
@@ -57,7 +57,8 @@ public class UpdaterTweaker implements ITweaker {
                     logger.error(String.format("Failed to download %s.", remote.getName()), e);
                 }
             }
-            Artifact<LocalLibrary> local = updater.libraryRepo.findArtifact(remote.getArtifactID());
+            LocalArtifact<LocalLibrary> local =
+                    updater.libraryRepo.findArtifact(remote.getArtifactID());
 
             try {
                 local.getArtifact().loadLibrary(classLoader);
@@ -68,7 +69,7 @@ public class UpdaterTweaker implements ITweaker {
     }
 
     private void registerTweaks() {
-        for (String tweak : updater.getRemoteJson().tweaks) {
+        for (String tweak : updater.getRemoteJson().getTweaks()) {
             registerTweak(tweak);
         }
     }

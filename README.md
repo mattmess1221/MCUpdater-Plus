@@ -1,6 +1,3 @@
-[![Build Status](http://ci.jam-craft.net/job/MCUpdater/badge/icon)](http://ci.jam-craft.net/job/MCUpdater/)
-
-
 Minecraft Modpack Updater
 ====
 

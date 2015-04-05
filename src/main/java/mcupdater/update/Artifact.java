@@ -1,27 +1,24 @@
 package mcupdater.update;
 
-import java.io.File;
-import java.io.FileNotFoundException;
+import java.lang.reflect.Type;
 
-public class Artifact<T extends IUpdatable> implements IUpdatable {
+import com.google.gson.JsonDeserializationContext;
+import com.google.gson.JsonDeserializer;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonParseException;
 
-    private LocalRepo<T> repository;
+public class Artifact implements IUpdatable {
+
     private String artifactID;
-    private File file;
-    private T artifact;
+    private String path;
 
-    public Artifact(LocalRepo<T> repo, String artifact) throws FileNotFoundException {
-        // TODO Auto-generated constructor stub
-        this.repository = repo;
+    public Artifact(String artifact) {
         this.artifactID = artifact;
-        this.file = fileFromArtifact(repository.getDirectory(), artifact);
-        if (!this.file.exists()) {
-            throw new FileNotFoundException("Artifact with ID " + artifact + " in repo " + repo + " does not exist.");
-        }
-        this.artifact = repo.getInstanceCreator().apply(file);
+        this.path = pathFromArtifact(artifact);
     }
 
-    private File fileFromArtifact(File dir, String artifact) {
+    private String pathFromArtifact(String artifact) {
+
         String[] args = artifact.split(":");
         String group = args[0].replace('.', '/');
         String name = args[1];
@@ -30,21 +27,29 @@ public class Artifact<T extends IUpdatable> implements IUpdatable {
         if (args.length == 4) {
             classifier = args[3];
         }
-        String filename = name + "-" + version + (classifier != null ? "-" + classifier : "") + ".jar";
+        String filename =
+                name + "-" + version + (classifier != null ? "-" + classifier : "") + ".jar";
         String path = String.format("%s/%s/%s/%s", group, name, version, filename);
-        return new File(dir, path);
+        return path;
     }
 
-    public T getArtifact() {
-        return artifact;
+    public String getArtifactID() {
+        return artifactID;
     }
 
-    public File getFile() {
-        return file;
+    public String getPath() {
+        return path;
     }
 
     @Override
     public String getVersion() {
         return this.artifactID.split(":")[2];
+    }
+
+    public static class Serializer implements JsonDeserializer<Artifact> {
+        @Override
+        public Artifact deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context) throws JsonParseException {
+            return new Artifact(json.getAsString());
+        }
     }
 }

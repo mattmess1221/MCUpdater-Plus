@@ -11,6 +11,9 @@ import java.net.URLConnection;
 import mcupdater.Platform;
 import mcupdater.Updater;
 import mcupdater.logging.LogHelper;
+import mcupdater.update.Artifact;
+import mcupdater.update.LocalRepository;
+import mcupdater.update.Repository;
 import mcupdater.update.libs.RemoteLibrary;
 import mcupdater.update.mods.LocalMod;
 import mcupdater.update.mods.RemoteMod;
@@ -31,7 +34,7 @@ public class Downloader {
     private final static File LIBRARIES_DIR = new File(MC_DIR, "libraries");
     private static final String DEFAULT_LIBRARY_URL = "https://libraries.minecraft.net/";
 
-    private static URL repo = Updater.getInstance().getLocalJson().getRemotePackURL();
+    private static URL url = Updater.getInstance().getLocalJson().getRemotePackURL();
 
     public static void downloadMod(RemoteMod remote) throws MalformedURLException {
         downloadMod(remote, null);
@@ -48,7 +51,7 @@ public class Downloader {
         if (a.startsWith("http")) {
             url = new URL(a);
         } else {
-            url = new URL(repo + a);
+            url = new URL(Downloader.url + a);
         }
         String[] split = url.getPath().split("/");
         File newFile = new File(MODS_DIR, split[split.length - 1]);
@@ -66,10 +69,9 @@ public class Downloader {
         } catch (IOException e) {
             logger.warn("Unable to read " + remote.getFile(), e);
         }
-
     }
 
-    public static void downloadLibrary(RemoteLibrary library) throws MalformedURLException, IOException {
+    public static void downloadLibrary(RemoteLibrary library) throws IOException {
         String url = DEFAULT_LIBRARY_URL;
         if (library.getURL() != null)
             url = library.getURL();
@@ -84,6 +86,22 @@ public class Downloader {
             downloadFileWithHashCheck(u, file, FileUtils.readFileToString(md5f));
         } catch (FileNotFoundException e) {
             downloadFile(u, file);
+        }
+    }
+
+    public static void downloadArtifact(Repository repo, Artifact artifact, LocalRepository<?> destRepo)
+            throws IOException {
+        String path = artifact.getPath();
+        URL source = new URL(repo.getDirectory() + "/" + path);
+        File dest = new File(destRepo.getFile() + "/" + path);
+        URL md5 = new URL(source + ".md5");
+        File md5f = new File(dest + ".md5");
+        try {
+            // try to download the md5
+            downloadFile(md5, md5f);
+            downloadFileWithHashCheck(source, dest, FileUtils.readFileToString(md5f));
+        } catch (FileNotFoundException e) {
+            downloadFile(source, dest);
         }
     }
 

@@ -84,7 +84,7 @@ public class Downloader {
         try {
             downloadFile(md5, md5f);
             downloadFileWithHashCheck(u, file, FileUtils.readFileToString(md5f));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             downloadFile(u, file);
         }
     }
@@ -100,7 +100,7 @@ public class Downloader {
             // try to download the md5
             downloadFile(md5, md5f);
             downloadFileWithHashCheck(source, dest, FileUtils.readFileToString(md5f));
-        } catch (FileNotFoundException e) {
+        } catch (IOException e) {
             downloadFile(source, dest);
         }
     }

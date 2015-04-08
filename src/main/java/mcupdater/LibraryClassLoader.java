@@ -2,38 +2,32 @@ package mcupdater;
 
 import java.io.File;
 import java.lang.reflect.Method;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLClassLoader;
 
 import mcupdater.logging.LogHelper;
-import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
 
 public class LibraryClassLoader {
 
     private static final LogHelper logger = LogHelper.getLogger();
 
-    private LaunchClassLoader classLoader;
     private static LibraryClassLoader instance;
+    private static Method ADDURL;
 
-    private LibraryClassLoader() {
-        this.classLoader = Launch.classLoader;
-        instance = this;
-    }
+    private LibraryClassLoader() {}
 
-    public void addLib(File modFile) throws MalformedURLException {
-        URL url = modFile.toURI().normalize().toURL();
+    public void addLib(File file, LaunchClassLoader classLoader) {
         try {
-            logger.info(String.format("Loading library %s.", modFile.getPath()));
-            URLClassLoader classLoader = (URLClassLoader) ClassLoader.getSystemClassLoader();
-            Method addURL = URLClassLoader.class.getDeclaredMethod("addURL", new Class[] { URL.class });
-            addURL.setAccessible(true);
-            addURL.invoke(classLoader, url);
+            logger.info(String.format("Loading library %s.", file.getPath()));
+            if (ADDURL == null) {
+                ADDURL = URLClassLoader.class.getDeclaredMethod("addURL", URL.class);
+                ADDURL.setAccessible(true);
+            }
+            ADDURL.invoke(classLoader.getClass().getClassLoader(), file.toURI().toURL());
+            classLoader.addURL(file.toURI().toURL());
         } catch (Exception e) {
-            logger.error(String.format("Failed to load %s into classpath.", modFile.getPath()), e);
-        } finally {
-            classLoader.addURL(url);
+            logger.error(String.format("Failed to load %s into classpath.", file.getPath()), e);
         }
     }
 

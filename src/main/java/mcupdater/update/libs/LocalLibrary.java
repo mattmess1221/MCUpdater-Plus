@@ -1,7 +1,6 @@
 package mcupdater.update.libs;
 
 import java.io.File;
-import java.net.MalformedURLException;
 import java.util.List;
 
 import mcupdater.LibraryClassLoader;
@@ -67,7 +66,7 @@ public class LocalLibrary extends AbstractLibrary {
         return file;
     }
 
-    public void loadLibrary(LaunchClassLoader classLoader) throws MalformedURLException {
-        LibraryClassLoader.getInstance().addLib(getFile());
+    public void loadLibrary(LaunchClassLoader classLoader) {
+        LibraryClassLoader.getInstance().addLib(getFile(), classLoader);
     }
 }

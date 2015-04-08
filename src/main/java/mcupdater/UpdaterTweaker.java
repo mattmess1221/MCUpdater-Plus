@@ -2,8 +2,8 @@ package mcupdater;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
 import java.util.List;
+import java.util.Map;
 
 import mcupdater.Side.Sides;
 import mcupdater.download.Downloader;
@@ -14,6 +14,8 @@ import mcupdater.update.libs.RemoteLibrary;
 import net.minecraft.launchwrapper.ITweaker;
 import net.minecraft.launchwrapper.Launch;
 import net.minecraft.launchwrapper.LaunchClassLoader;
+
+import com.google.common.collect.Maps;
 
 public class UpdaterTweaker implements ITweaker {
 
@@ -28,6 +30,18 @@ public class UpdaterTweaker implements ITweaker {
     public void acceptOptions(List<String> args, File gameDir, File assetsDir, String profile) {
         updater = new Updater(gameDir);
         updater.run(args.toArray(new String[args.size()]));
+
+        // add additional arguments
+        // needs to post to blackboard
+        if (!Launch.blackboard.containsKey("launchArgs")) {
+            Launch.blackboard.put("launchArgs", Maps.newHashMap());
+        }
+        @SuppressWarnings("unchecked")
+        Map<String, String> launchArgs = (Map<String, String>) Launch.blackboard.get("launchArgs");
+        String mods = updater.getAdditionalMods();
+        if (mods != null) {
+            launchArgs.put("--mods", mods);
+        }
     }
 
     @Override
@@ -57,14 +71,9 @@ public class UpdaterTweaker implements ITweaker {
                     logger.error(String.format("Failed to download %s.", remote.getName()), e);
                 }
             }
-            LocalArtifact<LocalLibrary> local =
-                    updater.libraryRepo.findArtifact(remote.getArtifactID());
+            LocalArtifact<LocalLibrary> local = updater.libraryRepo.findArtifact(remote.getArtifactID());
 
-            try {
-                local.getArtifact().loadLibrary(classLoader);
-            } catch (MalformedURLException e) {
-                logger.error(String.format("Failed to load library: %s.", local.getFile().getPath()), e);
-            }
+            local.getArtifact().loadLibrary(classLoader);
         }
     }
 

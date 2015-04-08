@@ -8,34 +8,34 @@ import mcupdater.Platform;
 
 public class RemoteLibrary extends AbstractLibrary {
 
-    String artifact;
+    String name;
     String url;
 
     @Override
     public String getGroup() {
-        return artifact.split(":")[0];
+        return name.split(":")[0];
     }
 
     @Override
     public String getName() {
-        return artifact.split(":")[1];
+        return name.split(":")[1];
     }
 
     @Override
     public String getVersion() {
-        return artifact.split(":")[2];
+        return name.split(":")[2];
     }
 
     public boolean hasClassifier() {
-        return artifact.split(":").length == 4;
+        return name.split(":").length == 4;
     }
 
     public String getClassifier() {
-        return artifact.split(":")[3];
+        return name.split(":")[3];
     }
 
     public String getArtifactID() {
-        return artifact;
+        return name;
     }
 
     public String getURL() {
@@ -49,7 +49,7 @@ public class RemoteLibrary extends AbstractLibrary {
     }
 
     public String getRelativePathForDownload() {
-        return getParentPath() + (hasClassifier() ? "-" + getClassifier() : "") + ".jar";
+        return getParentPath() + ".jar";
     }
 
     public String getRelativePath() {
@@ -58,7 +58,7 @@ public class RemoteLibrary extends AbstractLibrary {
 
     private String getParentPath() {
         return getGroup().replace('.', '/') + "/" + getName() + "/" + getVersion() + "/" + getName() + "-"
-                + getVersion();
+                + getVersion() + (hasClassifier() ? "-" + getClassifier() : "");
     }
 
     private File getLocalFile() {

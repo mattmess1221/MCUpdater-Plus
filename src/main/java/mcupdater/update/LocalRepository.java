@@ -27,6 +27,14 @@ public class LocalRepository<T> implements IRepository {
         return new LocalArtifact<T>(this, artifactId);
     }
 
+    public String findPath(Artifact artifact) {
+        return getFile().getName() + "/" + artifact.getPath();
+    }
+
+    public String findPath(String artifact) {
+        return findPath(findArtifact(artifact));
+    }
+
     public File getFile() {
         return this.topDirectory;
     }

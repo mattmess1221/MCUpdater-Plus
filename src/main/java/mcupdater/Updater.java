@@ -57,6 +57,8 @@ public class Updater {
     }
 
     public Updater(File file) {
+        if (file == null)
+            file = new File(".");
         gameDir = file;
         localCache = new File(gameDir, "localcache.json");
         window = ProgressWindow.newWindow();
@@ -321,5 +323,22 @@ public class Updater {
 
     public RemoteJson getRemoteJson() {
         return remote;
+    }
+
+    String getAdditionalMods() {
+        // start with the additional arguments
+        if (remote.getRepoMods().isEmpty()) {
+            return null;
+        }
+
+        StringBuilder mods = new StringBuilder();
+        for (Artifact artifact : this.remote.getRepoMods()) {
+            if (mods.length() > 0) { // append a comma beforehand.
+                mods.append(",");
+            }
+            mods.append(modsRepo.findPath(artifact));
+        }
+
+        return mods.toString();
     }
 }
